@@ -1,0 +1,1 @@
+;; funções que permitem escrever e ler em ficheiros e tratar da interação com o utilizador 
