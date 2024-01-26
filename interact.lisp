@@ -1,4 +1,6 @@
-;; funções que permitem escrever e ler em ficheiros e tratar da interação com o utilizador 
+;; funções que permitem escrever e ler em ficheiros e tratar da interação com o utilizador
+;; Autores: Nuno Martinho, João Coelho e João Barbosa
+;; Ano letivo 23/24
 
 (defun diretorio ()
     "C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
@@ -15,38 +17,19 @@
 
 (defun iniciar ()
 "Inicializa o programa."
-    (modo-jogo)
-)
-
-
-;; ============= NAVEGACAO =============
-
-(defun jogar (estado tempo)
-"Devolve uma lista com o tabuleiro em que deverá ser feita a próxima jogada."
-    ;; ??? esta no enunciado no ponto 3.2, ultimo paragrafo
-)
-
-(defun modo-jogo ()
-"Recebe a opcao de modo de jogo selecionada pelo utilizador."
     (progn
         (menu-inicial)
         (let ((opcao (read)))
-            (case opcao
+            (ecase opcao
                 (1 
                     (progn 
-                        (let* ((iniciante (opcao-iniciante))
-                                (tempo-limite (opcao-tempo))
-                            )
-                            ()) ;; inserir funcao modo Humano vs CPU
-                        (modo-jogo)
+                        (modo-hvc)
+                        (iniciar)
                 ))
                 (2
                     (progn
-                        (let* ((iniciante (opcao-iniciante))
-                                (tempo-limite (opcao-tempo))
-                            )
-                            ()) ;; inserir funcao modo CPU vs CPU
-                        (modo-jogo)
+                        (modo-cvc)
+                        (iniciar)
                 ))
                 (0 
                     (progn
@@ -54,28 +37,70 @@
                         (clear-output)
                         (format t "Obrigado por jogar!~%~%")
                 ))
-
-                (otherwise (progn (format t "Escolha uma opcao valida!") (modo-jogo)))    
+                (otherwise (progn (format t "Escolha uma opcao valida!") (iniciar)))    
             )
         )
     )
 )
 
-(defun opcao-iniciante (voltar)
-"Recebe a opcao do modo de jogo do menu."
+
+;; ============= INTERACAO =============
+
+;; Jogador 1: -1 | Jogador 2: -2
+
+(defun jogar (estado tempo)
+"Devolve uma lista com o tabuleiro em que deverá ser feita a próxima jogada."
+    ;; ??? esta no enunciado no ponto 3.2, ultimo paragrafo
+)
+
+(defun modo-hvc ()
+"Executa o modo de jogo Humano vs Computador."
+    (let* (
+            (iniciante (opcao-iniciante))
+            (tempo-limite (opcao-tempo))
+            (profund-max (opcao-profund-max))
+        )
+        (progn
+            (escrever-log 'log-inicio '("Humano vs CPU" iniciante tempo-limite profund-max))
+            (ecase iniciante
+                ('1 (hvc tempo-limite profund-max -1))
+                ('2 (hvc tempo-limite profund-max -2))
+            )
+        )
+    )
+)
+
+(defun modo-cvc ()
+"Executa o modo de jogo Computador vs Computador."
+    (let ((tempo-limite (opcao-tempo)))
+        (progn
+            (escrever-log 'log-inicio '("CPU vs CPU" nil tempo-limite))
+            (cvc tempo-limite profund-max -1)
+            (log-fim)
+        ) 
+    )
+)
+
+
+(defun hvc (tempo-limite prodund-max jogador &optional (no-atual ())) ;; add fn construir no ao optional 
+"Executa o decorrer do jogo Humano vs CPU."
+
+)
+
+(defun cvc (tempo-limite prodund-max jogador &optional (no-atual ())) ;; add fn construir no ao optional 
+"Executa o decorrer do jogo CPU vs CPU."
+
+)
+
+(defun opcao-iniciante ()
+"Recebe do utilizador a opcao de quem inicia o jogo."
     (progn
         (menu-iniciante)
         (let ((opcao (read)))
-            (case opcao
-                (1 
-                    'humano
-                )
-                (2
-                    'cpu
-                )
-                (0
-                    (voltar)
-                )
+            (ecase opcao
+                ('1 'humano)
+                ('2 'cpu)
+                ('0 (iniciar))
                 (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-iniciante)))    
             )
         )
@@ -87,14 +112,28 @@
     (progn
         (menu-tempo)
         (let ((tempo (read)))
-            (case opcao
+            (ecase tempo
                 ((and (>= tempo 1000) (<= tempo 5000)) 
                     tempo
                 )
-                (0
-                    (opcao-iniciante)
-                )
+                ('0 (opcao-iniciante))
                 (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-tempo)))    
+            )
+        )
+    )
+)
+
+(defun opcao-profund-max ()
+"Recebe um valor de profundidade maxima do utilizador."
+    (progn 
+        (profund-max-menu)
+        (let ((profund-max (read)))
+            (ecase profund-max 
+                ((>= profund-max 0) 
+                    profund-max
+                )
+                ('0 (opcao-tempo))
+                (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-profund-max)))
             )
         )
     )
@@ -105,11 +144,11 @@
     (progn
         (format t "~%~% Linha >> ")
         (let ((linha (read)))
-            (case opcao
+            (ecase linha
                 ((and (>= linha 1) (<= linha 10)) 
                     linha
                 )
-                (0
+                ('0
                     (opcao-iniciante)
                 )
                 (otherwise (progn (format t "Escolha uma linha valida!") (opcao-linha)))    
@@ -123,11 +162,11 @@
     (progn
         (format t "~%~% Coluna >> ")
         (let ((coluna (read)))
-            (case opcao
+            (ecase coluna
                 ((and (>= coluna 1) (<= coluna 10)) 
                     coluna
                 )
-                (0
+                ('0
                     (opcao-iniciante)
                 )
                 (otherwise (progn (format t "Escolha uma coluna valida!") (opcao-coluna)))    
@@ -145,7 +184,7 @@
         ;;(format t "~%A carregar jogo...~%")
         ;;(sleep 1)
         (format t "~%o                                  o")
-        (format t "~%|      - Problema do Cavalo -      |")
+        (format t "~%|        - Jogo do Cavalo -        |")
         (format t "~%|                                  |")
         (format t "~%|        1 - Humano vs CPU         |")
         (format t "~%|        2 - CPU vs CPU            |")
@@ -184,29 +223,35 @@
     )
 )
 
-(defun menu-jogada ()
-"Mostra o menu de jogada do Humano."
-    (format t "~% Defina as coordenadas para a sua jogada:")
+(defun profund-max-menu ()
+"Mostra uma mensagem para escolher a profundidade maxima."
+    (progn
+        (format t "~%o                                             o")
+        (format t "~%|      - Defina a profundidade maxima -       |")
+        (format t "~%|                                             |")
+        (format t "~%|                0 - Voltar                   |")
+        (format t "~%o                                             o")
+        (format t "~%~%>> ")
+    )
 )
 
-(defun menu-fim (vencedor)
-"Mostra o resultado do jogo."
-    (progn
-        (format t "~% Partida terminada!")
-        (format t "~% O vencedor é: ~a" vencedor)
-        (format t "~%~% Todos os detalhes da partida estão registados em log.dat.")
-    )
+(defun menu-jogada ()
+"Mostra o menu de jogada do Humano."
+    (format t "~% Defina as coordenadas para a sua jogada.")
 )
 
 
 ;; ============= ESTATISTICAS =============
 
-(defun ficheiro-log (fn dados)
-"Output de registos estatisticos do jogo e de cada jogada do mesmo."
-    (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
-        (funcall fn stream dados)
-        (finish-output stream)
-        (close stream)
+(defun escrever-log (fn dados)
+"Output de registos estatisticos do jogo."
+    (progn    
+        (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
+            (funcall fn stream dados)
+            (finish-output stream)
+            (close stream)
+        )
+        (funcall fn t dados)
     )
 )
 
@@ -221,30 +266,67 @@
     )
 )
 
-(defun estatisticas-jogo (stream dados)
+(defun log-inicio (stream dados)
 "Output de dados iniciais do jogo."
     (let* ((modo (first dados))
             (iniciante (second dados))
             (tempo-limite (third dados))
         )
-        (progn 
-            (format stream "~%~a" (get-decoded-time))
-            (format stream "~%Modo de Jogo: ~a" modo)
-            (format stream "~%Primeiro a jogar: ~a" iniciante)
-            (format stream "~%Tempo limite da jogada CPU: ~a" tempo-limite)
-        ))
+        (progn
+            (format stream "~%o                                                  o")
+            (format stream "~%|                - Jogo do Cavalo -                |")
+            (format stream "~%|                 Partida iniciada.                |")
+            (format stream "~%|                                                  |")
+            (format stream "~%|                  Modo de Jogo: ~a                |" modo)
+            (if (iniciante)
+                (format stream "~%|                  1.º a jogar: ~a                 |" iniciante)
+                continue
+            )
+            (format stream "~%|          Tempo limite da jogada CPU: ~a ms       |" tempo-limite)
+            (format stream "~%|                                                  |")
+            (format stream "~%o                                                  o")
+            (format stream "~%~%")
+        )
+    )
 )
 
-(defun estatisticas-jogada (stream dados)
+(defun log-jogada (stream dados)
 "Output de dados da jogada."
     (let* (
+            (no-atual ())
+            (jogada ())
+            (linha ())
+            (coluna ())
+            (jogador ())
             (nos-analisados ())
             (num-cortes ())
             (tempo-jogada ())
             (tabuleiro-atual ())
            )
         (progn
-            ()
+            ();; tabuleiro
+            (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
+            (format stream "~% Nos analisados: ~a" nos-analisados)
+            (format stream "~% Numero de cortes: ~a" num-cortes)
+            (format stream "~% Duracao da jogada: ~a" tempo-jogada)
+            (format stream "~%~%")
         )
+    )
+)
+
+(defun log-fim (stream no)
+"Mostra o resultado do jogo."
+    (progn
+        (format stream "~%o                                                  o")
+        (format stream "~%|                - Jogo do Cavalo -                |")
+        (format stream "~%|                Partida terminada.                |")
+        (format stream "~%|                                                  |")
+        (format stream "~%|               ~% O vencedor é: ~a!               |")
+        (format stream "~%|                                                  |")
+        (format stream "~%|              ~% Jogador 1: ~a pontos             |")
+        (format stream "~%|              ~% Jogador 2: ~a pontos             |")
+        (format stream "~%|                                                  |")
+        (format stream "~%o                                                  o")
+        (format stream "~%~% ")
     )
 )
