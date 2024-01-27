@@ -187,30 +187,31 @@
     )
 )
 
-(defun opcao-coordenadas (tabuleiro)
+(defun opcao-coordenadas ()
 "Recebe do utilizador a posicao na qual ele pretende jogar."
     (progn
         (menu-jogada)
         (format t "~% Linha: ")
         (let ((linha (read)))
             (cond ((and (numberp linha) (>= linha 0) (<= linha 9))
-                    (t (append linha))
+                    (progn 
+                        (format t " Coluna: ")
+                        (let ((coluna (read)))
+                            (cond ((and (numberp coluna) (>= coluna 0) (<= coluna 9))
+                                    (list linha coluna)
+                                )
+                                (t (progn
+                                    (format t "~% Posicao invalida. Tente novamente!")
+                                    (opcao-coordenadas)
+                                ))
+                            )
+                        )
+                    )
                 )
-                (progn
+                (t (progn
                     (format t "~% Posicao invalida. Tente novamente!")
                     (opcao-coordenadas)
-                )
-            )
-        )
-        (format t "~% Coluna: ")
-        (let ((coluna (read)))
-            (cond ((and (numberp coluna) (>= coluna 0) (<= coluna 9))
-                    (t (append coluna))
-                )
-                (progn
-                    (format t "~% Posicao invalida. Tente novamente!")
-                    (opcao-coordenadas)
-                )
+                ))
             )
         )
     )
@@ -256,7 +257,7 @@
     (progn
         (format t "~%o                                                  o")
         (format t "~%|  - Defina o tempo limite para a jogada do CPU -  |")
-        (format t "~%|                (em milissegundos)                |")
+        (format t "~%|           (1000 a 5000 milissegundos)            |")
         (format t "~%|                                                  |")
         (format t "~%|                    0 - Voltar                    |")
         (format t "~%o                                                  o")
