@@ -185,6 +185,22 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
   (posicao-valor (reduce (lambda (a b) (if (> a b) a b)) (linha linha tabuleiro))
                  tabuleiro))
 
+(defun primeira-jogada-j1 (tabuleiro)
+  (let* ((pos-maior-valor-1linha (pos-valor-mais-alto tabuleiro 0))
+        (novo-tabuleiro (substituir (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro jogador-1))
+        )
+    (list novo-tabuleiro (celula (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro) jogador-1)
+    )
+  )
+
+(defun primeira-jogada-j2 (tabuleiro)
+  (let* ((pos-maior-valor-linha (pos-valor-mais-alto tabuleiro 9))
+        (novo-tabuleiro (substituir (car pos-maior-valor-linha) (cadr pos-maior-valor-linha) tabuleiro jogador-2))
+        )
+    (list novo-tabuleiro (celula (car pos-maior-valor-linha) (cadr pos-maior-valor-linha) tabuleiro) jogador-2)
+    )
+  )
+
 (defun primeiras-jogadas (tabuleiro)
   "Devolve o tabuleiro com as pecas metidas"
 

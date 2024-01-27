@@ -1,7 +1,7 @@
 ;;  Autores: Nuno Martinho e Joao Coelho e João Barbosa.
 
 ;; ============= ESTRUTURAS =============
-;; <no>::= (<tabuleiro> <pai> <f> <d> pontos1 pontos2)
+;; <no>::= (<tabuleiro> <pai> <f> pontos1 pontos2)
 ;;<jogada>::= (<jogador> <linha> <coluna>)
 ;; <solucao>::= (<caminho-solucao> <n-abertos> <n-fechados>)
 
@@ -12,8 +12,8 @@
 (defun negamax (no
                 tempo-limite
                 &optional
-                (cor 1)                                             ;; começar com no max
                 (d-maximo 50)                                       ;; profundidade default e' 50
+                (cor 1)                                             ;; começar com no max
                 (alfa most-negative-fixnum)                         ;; comecar o alfa a -infinito
                 (beta most-positive-fixnum)                         ;; comecar o beta a +infinito
                 (tempo-inicial (get-universal-time))                ;; tempo que comeca o algoritmo
@@ -43,8 +43,8 @@
          no
          lista-expandidos
          tempo-limite
-         cor
          d-maximo
+         cor
          alfa
          beta
          tempo-inicial
@@ -55,8 +55,8 @@
 (defun negamax-aux (no-pai
                      sucessores
                      tempo-limite
-                     cor
                      d-maximo
+                     cor
                      alfa
                      beta
                      tempo-inicial
@@ -69,8 +69,8 @@
      (negamax                 ;; inverter negamax
        (inverter-sinal-no (car sucessores) fn-inverter-sinal-jogo)
        tempo-limite
-       (- cor)
        (1- d-maximo)
+       (- cor)
        (- beta)
        (- alfa)
        tempo-inicial
@@ -79,8 +79,8 @@
    (T
      (let* ((solucao (negamax (inverter-sinal-no (car sucessores) fn-inverter-sinal-jogo)
                               tempo-limite
-                              (- cor)
                               (1- d-maximo)
+                              (- cor)
                               (- beta)
                               (- alfa)
                               tempo-inicial
@@ -99,8 +99,8 @@
            (negamax-aux no-pai 
                         (cdr sucessores) 
                         tempo-limite 
-                        cor 
                         d-maximo 
+                        cor 
                         novo-alfa 
                         beta 
                         tempo-inicial 
