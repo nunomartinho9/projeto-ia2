@@ -1,4 +1,3 @@
-
 ;;  Autores: Nuno Martinho e Joao Coelho e João Barbosa.
 
 
@@ -8,7 +7,6 @@
 (defparameter jogador-2 -2)
 
 ;; ============= TABULEIROS =============
-
 
 
 (defun tabuleiro-teste ()
@@ -26,8 +24,8 @@
 
 (defun tabuleiro-jogado ()
   "Tabuleiro de teste igual ao anterior mas tendo sido colocado o cavalo na posicao: i=0 e j=0"
-  '((-1 25 54 89 21 8 36 14 41 96)
-    (78 47 56 23 5 NIL 13 12 26 60)
+  '((94 25 54 89 21 8 36 14 41 96)
+    (78 47 56 23 5 49 13 12 26 60)
     (0 27 17 83 34 93 74 52 45 80)
     (69 9 77 95 55 39 91 73 57 30)
     (24 15 22 86 1 11 68 79 76 72)
@@ -36,6 +34,19 @@
     (59 42 46 85 90 75 87 43 20 31)
     (3 61 58 44 65 82 19 4 35 62)
     (33 70 84 40 66 38 92 67 98 97)))
+
+(defun tabuleiro-erro ()
+  "Tabuleiro de teste sem nenhuma jogada realizada"
+  '((-1 25 54 89 21 8 36 14 41 96)
+    (78 47 -2 23 5 49 13 12 26 60)
+    (0 NIL 17 83 34 93 74 52 45 80)
+    (69 9 77 95 55 39 91 73 57 30)
+    (24 15 22 86 1 11 68 79 76 72)
+    (81 48 32 2 64 16 50 37 29 71)
+    (99 51 6 18 53 28 7 63 10 88)
+    (59 42 46 85 90 75 87 43 20 31)
+    (3 61 58 44 65 82 19 4 35 62)
+    (33 70 84 40 66 38 92 67 -2 97)))
 
 ;; ============= FUNCOES AUXILIARES =============
 
@@ -64,13 +75,10 @@ tabuleiro"
 (defun celula (lin col tabuleiro)
   "Funcao que recebe dois indices e o tabuleiro e retorna o valor presente nessa celula do
 tabuleiro"
-  
-  (if (and (null lin) (null col)) nil 
-      
-      (if (or (< lin 0) (< col 0)) NIL (linha col (linha lin tabuleiro)))
-      )
-  
-  )
+
+  (if (and (null lin) (null col)) nil
+
+      (if (or (< lin 0) (< col 0)) NIL (linha col (linha lin tabuleiro)))))
 
 ;; (lista-numeros)
 #|
@@ -117,26 +125,10 @@ entre 0 (inclusive) e o numero passado como argumento (exclusive). Por default o
 (defun inverter-sinal-tabuleiro (tabuleiro)
   "Inverte o sinal de todos os jogadores no tabuleiro."
   (let* ((coordenadas-j1 (posicao-jogador1 tabuleiro))
-         (coordenadas-j2 (posicao-jogador2 tabuleiro))
-         )
-    (substituir (car coordenadas-j2) (cadr coordenadas-j2) 
+         (coordenadas-j2 (posicao-jogador2 tabuleiro)))
+    (substituir (car coordenadas-j2) (cadr coordenadas-j2)
                 (substituir (car coordenadas-j1) (cadr coordenadas-j1) tabuleiro jogador-2)
-                jogador-1
-                )
-    )
-  
-  
-
-  
-  
-
-  #| (mapcar (lambda (linha)
-            (mapcar (lambda (elemento)
-                      (if (or (= elemento -1) (= elemento -2))
-                          (- elemento)
-                          elemento))
-                    linha))
-          tabuleiro) |#)
+                jogador-1)))
 
 
 ;; (substituir-posicao 0 (linha 0 (tabuleiro-teste)))
@@ -175,7 +167,6 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
    (t (posicao-valor valor tabuleiro row (1+ column)))))
 
 
-
 ;; (posicao-cavalo (tabuleiro-teste))
 ;; NIL
 ;; (posicao-cavalo (tabuleiro-jogado))
@@ -190,6 +181,21 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
   (posicao-valor jogador-2 tabuleiro))
 
 
+(defun pos-valor-mais-alto (tabuleiro linha)
+  (posicao-valor (reduce (lambda (a b) (if (> a b) a b)) (linha linha tabuleiro))
+                 tabuleiro))
+
+(defun primeiras-jogadas (tabuleiro)
+  "Devolve o tabuleiro com as pecas metidas"
+
+  (let ((pos-maior-valor-1linha (pos-valor-mais-alto tabuleiro 0))
+        (pos-maior-valor-2linha (pos-valor-mais-alto tabuleiro 9)))
+
+    (substituir (car pos-maior-valor-2linha) (cadr pos-maior-valor-2linha)
+
+                (substituir (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro jogador-1) jogador-2)))
+
+
 ;;(contar-casas-validas (linha 0 (tabuleiro-teste)))
 ;;10
 (defun contar-casas-validas (linha)
@@ -200,17 +206,16 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
    (t (1+ (contar-casas-validas (cdr linha))))))
 
 (defun contar-casas-validas-tabuleiro (tabuleiro &optional (l 0))
-"Devolve o numero de casas validas no tabuleiro."
+  "Devolve o numero de casas validas no tabuleiro."
   (if (and (>= l 0) (<= l 9))
       (+ (contar-casas-validas (linha l tabuleiro)) (contar-casas-validas-tabuleiro tabuleiro (1+ l)))
       0))
 
 (defun casas-validas-posicoes (tabuleiro &optional (casas (linha 0 tabuleiro)))
-"Devolve uma lista com as posicoes das casas validas por linha."
+  "Devolve uma lista com as posicoes das casas validas por linha."
   (mapcar #'(lambda (l)
               (posicao-valor l tabuleiro))
     (remover-se #'(lambda (x) (or (eq x nil) (eq x -1) (eq x -2))) casas)))
-
 
 
 (defun posicionar-jogador1 (tabuleiro &optional (lin 0) (col 0))
@@ -276,43 +281,71 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
                           (posicao-valor dp tabuleiro)) (lista-duplos))))
 
 
-
-
-
-
-
 ;; ============= OPERADORES =============
 
-(defun mover-jogador (jogador tabuleiro &optional (valLinha 0) (valColuna 0))
+(defun mover-jogador (jogador tabuleiro &optional (valLinha 0) (valColuna 0) (humano NIL))
   "Funcao auxiliar para os operadores."
-(let* ((tabuleiroComJogador tabuleiro)
-       (lin (car (posicao-valor jogador tabuleiroComJogador)))
-       (col (cadr (posicao-valor jogador tabuleiroComJogador)))
-       (novaPosicaoJogador (celula (if lin
-                                        (+ lin valLinha)
-                                        lin)
-                                    (if col
-                                        (+ col valColuna)
-                                        col)
-                                    tabuleiroComJogador)))
+  (let* ((posicaoJogador (posicao-valor jogador tabuleiro))
+         (lin (car posicaoJogador))
+         (col (cadr posicaoJogador))
+         (novaLinha (if humano valLinha (+ lin valLinha)))
+         (novaColuna (if humano valColuna (+ col valColuna)))
+         (novaPosicaoJogador (celula novaLinha novaColuna tabuleiro)))
 
-    (cond
-     ((eq novaPosicaoJogador NIL) NIL) ;;posicao invalida, movimento ilegal.
+    (if (posicao-valida-p novaPosicaoJogador tabuleiro jogador)
 
-     (t
-       (let* ((tabuleiroJogada (substituir (+ lin valLinha) (+ col valColuna) (substituir lin col tabuleiroComJogador) jogador))
-              (duplos-list (posicao-duplos tabuleiroJogada))
-              (duplo (if duplos-list
-                         (nth (random (length duplos-list)) duplos-list)
-                         nil)))
-         (if (eq t (duplop novaPosicaoJogador))
-             (list (substituir (car duplo) (cadr duplo) tabuleiroJogada) novaPosicaoJogador jogador)
-             (list (eliminar-simetrico novaPosicaoJogador tabuleiroJogada) novaPosicaoJogador jogador)))))))
+        (let* ((tabuleiroPosJogadorAnteriorNil (substituir lin col tabuleiro))
+               (tabuleiroJogada
+                (if humano
+                    (substituir valLinha valColuna tabuleiroPosJogadorAnteriorNil jogador)
+                    (substituir (+ lin valLinha) (+ col valColuna) tabuleiroPosJogadorAnteriorNil jogador)))
+               (duplos-list (posicao-duplos tabuleiroJogada))
+               (duplo (if duplos-list
+                          (nth (random (length duplos-list)) duplos-list)
+                          nil)))
+          (if (duplop novaPosicaoJogador)
+              (list (substituir (car duplo) (cadr duplo) tabuleiroJogada) novaPosicaoJogador jogador)
+              (list (eliminar-simetrico novaPosicaoJogador tabuleiroJogada) novaPosicaoJogador jogador)))
+        
+        NIL)))
+
+
+(defun posicao-valida-p (posicao tabuleiro jogador)
+  "Verifica se a posição é válida no tabuleiro para o jogador."
+  (and (not (eq posicao NIL))
+       (not (eq posicao jogador-1))
+       (not (eq posicao jogador-2))
+       (member posicao (lista-movimentos-valido jogador tabuleiro))))
+
+
+(defun lista-movimentos-valido (jogador tabuleiro)
+
+  (let* ((pos (posicao-valor jogador tabuleiro))
+         (pos-linha-jogador (car pos))
+         (pos-coluna-jogador (cadr pos))
+         (jogada-1 (celula (+ pos-linha-jogador 2) (+ pos-coluna-jogador -1) tabuleiro))
+         (jogada-2 (celula (+ pos-linha-jogador 2) (+ pos-coluna-jogador 1) tabuleiro))
+         (jogada-3 (celula (+ pos-linha-jogador 1) (+ pos-coluna-jogador 2) tabuleiro))
+         (jogada-4 (celula (+ pos-linha-jogador -1) (+ pos-coluna-jogador 2) tabuleiro))
+         (jogada-5 (celula (+ pos-linha-jogador -2) (+ pos-coluna-jogador 1) tabuleiro))
+         (jogada-6 (celula (+ pos-linha-jogador -2) (+ pos-coluna-jogador -1) tabuleiro))
+         (jogada-7 (celula (+ pos-linha-jogador -1) (+ pos-coluna-jogador -2) tabuleiro))
+         (jogada-8 (celula (+ pos-linha-jogador 1) (+ pos-coluna-jogador -2) tabuleiro)))
+
+    (remover-se #'(lambda (x) (eq x nil))
+                (list jogada-1
+                      jogada-2
+                      jogada-3
+                      jogada-4
+                      jogada-5
+                      jogada-6
+                      jogada-7
+                      jogada-8))))
 
 ;; <tabuelerio> <score> <jogador>
 (defun operador-1 (tabuleiro jogador)
   "mover o cavalo 2 linhas para baixo e uma coluna para a esquerda"
-  
+
   (mover-jogador jogador tabuleiro 2 -1))
 
 
@@ -366,6 +399,12 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
                (operador-7 tabuleiro jogador)
                (operador-8 tabuleiro jogador))))
 
+(defun jogador-pode-mover (tabuleiro jogador)
+  "verifica se o jogador ainda se pode mover"
+  (if (usar-operadores tabuleiro jogador)
+
+      T NIL))
+
 ;; (format-tabuleiro (tabuleiro-teste))
 (defun format-tabuleiro (tabuleiro &optional (stream t))
   "Formata o tabuleiro"
@@ -387,12 +426,9 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
                       (format stream "-------------------------------------------------------------~%")
                       (format-tabuleiro-coord (first r))
                       (format stream "-------------------------------------------------------------~%")
-                      (format T "JOGADOR~d JOGOU ~d NA POSICAO ~a~%" (third r) (third r) (posicao-valor (third r) (first r)))
-                      )
-                     )
-           resultados)
-         ))
-#|   (not (null (mapcar #'(lambda (l)
+                      (format T "JOGADOR~d JOGOU ~d NA POSICAO ~a~%" (third r) (third r) (posicao-valor (third r) (first r)))))
+           resultados)))
+  #|   (not (null (mapcar #'(lambda (l)
                          (progn
                           (format-tabuleiro-coord l)
                           (format stream "-------------------------------------------------------------~%"))) 
@@ -402,17 +438,13 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
 ;; ============= SELETORES RESULTADOS =============
 
 (defun resultado-tabuleiro (resultado)
-  (first resultado)
-  )
+  (first resultado))
 
 (defun resultado-pontos (resultado)
-  (second resultado)
-  )
+  (second resultado))
 
 (defun resultado-jogador (resultado)
-  (third resultado)
-  )
-
+  (third resultado))
 
 
 (defun format-tabuleiro-coord (tabuleiro &optional (stream t))
@@ -426,8 +458,8 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
   (loop for linha in tabuleiro
         for i from 0
         do (progn
-             (format stream "~5d    " i) ; Imprimir coordenadas das linhas
-             (loop for elemento in linha
-                   do (format stream "~5a" elemento))
-             (format stream "~%")))
+            (format stream "~5d    " i) ; Imprimir coordenadas das linhas
+            (loop for elemento in linha
+                  do (format stream "~5a" elemento))
+            (format stream "~%")))
   (format t "~%"))
