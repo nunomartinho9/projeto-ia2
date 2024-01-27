@@ -132,7 +132,7 @@
             (jogadas-cpu1 (length (gerar-sucessores no-atual -1)))
             (jogadas-cpu2 (length (gerar-sucesores no-atual -2)))
         )
-        (cond ;;(() escrever-log 'log-fim no-atual)
+        (cond ;;((and (eq jogadas-cpu1 0) (eq jogadas-cpu2 0)) escrever-log 'log-fim no-atual)
               (t ;; jogada CPU
                 ()
               )
@@ -287,13 +287,13 @@
 
 (defun escrever-log (fn dados)
 "Output de registos estatisticos do jogo no ecra e no ficheiro."
-    (progn    
+    (progn
+        (funcall fn t dados) ;; escrever no ecra
         (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
             (funcall fn stream dados)
             (finish-output stream)
             (close stream)
-        )
-        (funcall fn t dados)
+        ) ;; escrever no ficheiro log.dat
     )
 )
 
@@ -344,6 +344,7 @@
 (defun log-jogada (stream dados)
 "Output de dados da jogada."
     (let* (
+            (tabuleiro ())
             (linha ())
             (coluna ())
             (jogador ())
@@ -354,7 +355,7 @@
             (tempo-jogada ())
            )
         (progn
-            ();; tabuleiro
+            (format-tabuleiro-coord tabuleiro stream)
             (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
             (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" pontos-j1 pontos-j2)
             (format stream "~% Nos analisados: ~a" nos-analisados)
@@ -364,6 +365,8 @@
         )
     )
 )
+;; 
+
 
 (defun log-fim (stream dados)
 "Mostra o resultado do jogo."
