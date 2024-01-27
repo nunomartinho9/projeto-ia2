@@ -46,7 +46,6 @@
 
 ;; ============= INTERACAO =============
 
-;; Jogador 1: -1 | Jogador 2: -2
 
 (defun modo-hvc ()
 "Executa o modo de jogo Humano vs Computador."
@@ -58,8 +57,8 @@
         (progn
             (escrever-log 'log-inicio '("Humano vs CPU" iniciante tempo-limite profund-max))
             (case iniciante
-                ('1 (hvc tempo-limite profund-max -1))
-                ('2 (hvc tempo-limite profund-max -2))
+                ('1 (hvc tempo-limite profund-max -2))
+                ('2 (hvc tempo-limite profund-max -1))
             )
         )
     )
@@ -79,14 +78,16 @@
     )
 )
 
+;; Jogador 1 (CPU): -1 | Jogador 2 (Humano): -2
 
 (defun hvc (tempo-limite profund-max jogador &optional (no-atual ())) ;; add fn construir-no ao optional 
 "Executa o decorrer do jogo Humano vs CPU."
     (let* (
             (tabuleiro-atual ())
+            ()
         )
-        (cond (() escrever-log 'log-fim no-atual)
-              ((eq jogador -1) ;; jogada Humano
+        (cond ;;(() escrever-log 'log-fim no-atual)
+              ((eq jogador -2) ;; jogada Humano
                 ()
               )
               (t ;; jogada CPU
@@ -101,7 +102,7 @@
     (let* (
             (tabuleiro-atual ())
         )
-        (cond (() escrever-log 'log-fim no-atual)
+        (cond ;;(() escrever-log 'log-fim no-atual)
               (t ;; jogada CPU
                 ()
               )
@@ -115,8 +116,8 @@
         (menu-iniciante)
         (let ((opcao (read)))
             (case opcao
-                ('1 'humano)
-                ('2 'cpu)
+                ('1 'Humano)
+                ('2 'CPU)
                 ('0 (iniciar))
                 (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-iniciante)))    
             )
@@ -254,7 +255,7 @@
 
 (defun menu-jogada ()
 "Mostra o menu de jogada do Humano."
-    (format t "~% Defina as coordenadas para a sua jogada.")
+    (format t "~%Defina as coordenadas para a sua jogada.")
 )
 
 
