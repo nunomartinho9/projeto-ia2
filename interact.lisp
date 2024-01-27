@@ -61,11 +61,10 @@
         )
         (progn
             (escrever-log 'log-inicio (list "Humano vs CPU" iniciante tempo-limite profund-max))
-            #|
             (case iniciante
                 ('Humano (hvc tempo-limite profund-max -2))
                 ('CPU (hvc tempo-limite profund-max -1))
-            ) |#
+            )
         )
     )
 )
