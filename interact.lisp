@@ -21,23 +21,25 @@
         (menu-inicial)
         (let ((opcao (read)))
             (case opcao
-                ('1 
+                (1 
                     (progn 
                         (modo-hvc)
                         (iniciar)
                 ))
-                ('2
+                (2
                     (progn
                         (modo-cvc)
                         (iniciar)
                 ))
-                ('0 
-                    (progn
+                (0 
+                    (progn                    
+                        (format t "Obrigado por jogar!~%~%") 
+                        (clear-input) 
+                        (clear-output) 
                         (finish-output)
-                        (clear-output)
-                        (format t "Obrigado por jogar!~%~%")
-                ))
-                (otherwise (progn (format t "Escolha uma opcao valida!") (iniciar)))    
+                        )
+                  )
+                (t (progn (format t "Escolha uma opcao valida!") (iniciar)))    
             )
         )
     )
@@ -144,11 +146,11 @@
 "Recebe do utilizador a opcao de quem inicia o jogo."
     (progn
         (menu-iniciante)
-        (let ((opcao (read)))
+        (let ((iniciante (read)))
             (cond
-                ('1 'Humano)
-                ('2 'CPU)
-                ('0 (iniciar))
+                ((eql iniciante 1) 'Humano)
+                ((eql iniciante 2) 'CPU)
+                ((eql iniciante 0) (iniciar))
                 (t (progn (format t "Escolha uma opcao valida!") (opcao-iniciante)))    
             )
         )
@@ -164,7 +166,7 @@
                 ((and (>= tempo 1000) (<= tempo 5000)) 
                     tempo
                 )
-                ((eq tempo 0) (opcao-iniciante))
+                ((eql tempo 0) (opcao-iniciante))
                 (t (progn (format t "Escolha uma opcao valida!") (opcao-tempo)))    
             )
         )
@@ -176,11 +178,11 @@
     (progn 
         (profund-max-menu)
         (let ((profund-max (read)))
-            (cond  
+            (cond
                 ((> profund-max 0)
                     profund-max
                 )
-                ('0 (opcao-tempo))
+                ((eql profund-max 0) (opcao-tempo))
                 (t (progn (format t "Escolha uma opcao valida!") (opcao-profund-max)))
             )
         )
