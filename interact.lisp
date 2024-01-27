@@ -128,7 +128,11 @@
                      (let ((no-solucao (negamax no-atual tempo-limite profund-max)))
                        (progn
                         (format-estado no-solucao -1)
-                        (hvc tempo-limite profund-max -2 (car no-solucao)))))))))))
+                        (hvc tempo-limite profund-max -2 (car no-solucao))))
+                     (progn
+                                    (format t "~% CPU Nao tem mais jogadas possiveis! ~%")
+                                    (hvc tempo-limite profund-max -2 no-atual))
+                     )))))))
 
 
 (defun format-estado (solucao jogador &optional (stream t))
