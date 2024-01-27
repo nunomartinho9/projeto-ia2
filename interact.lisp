@@ -232,7 +232,7 @@
   "Mostra o menu de escolha do jogador que começa o jogo."
   (progn
    (format t "~%o                                                  o")
-   (format t "~%|          - Escolha quem começa o jogo -          |")
+   (format t "~%|          - Escolha quem comeca o jogo -          |")
    (format t "~%|                                                  |")
    (format t "~%|                  1 - Humano                      |")
    (format t "~%|                  2 - CPU                         |")
@@ -294,23 +294,28 @@
     (format nil "~ds" segundos)))
 
 (defun log-inicio (stream dados)
-  "Output de dados iniciais do jogo."
-  (let* ((modo (first dados))
-         (iniciante (second dados))
-         (tempo-limite (third dados)))
-    (progn
-     (format stream "~%o                                                  o")
-     (format stream "~%|                - Jogo do Cavalo -                |")
-     (format stream "~%|                 Partida iniciada.                |")
-     (format stream "~%|                                                  |")
-     (format stream "~%|            Modo de Jogo: ~a           |" modo)
-     (if iniciante
-         (format stream "~%|            1.º a jogar: ~a                   |" iniciante)
-         (continue))
-     (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
-     (format stream "~%|                                                  |")
-     (format stream "~%o                                                  o")
-     (format stream "~%~%"))))
+"Output de dados iniciais do jogo."
+    (let* ((modo (first dados))
+            (iniciante (second dados))
+            (tempo-limite (third dados))
+        )
+        (progn
+            (format stream "~%o                                                  o")
+            (format stream "~%|                - Jogo do Cavalo -                |")
+            (format stream "~%|                 Partida iniciada.                |")
+            (format stream "~%|                                                  |")
+            (format stream "~%|            Modo de Jogo: ~a           |" modo)
+            (if iniciante
+                (format stream "~%|            1.o a jogar: ~a                   |" iniciante)
+                (continue)
+            )
+            (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
+            (format stream "~%|                                                  |")
+            (format stream "~%o                                                  o")
+            (format stream "~%~%")
+        )
+    )
+)
 
 (defun log-jogada (stream dados)
   "Output de dados da jogada."
@@ -344,7 +349,7 @@
      (format stream "~%|                - Jogo do Cavalo -                |")
      (format stream "~%|                Partida terminada.                |")
      (format stream "~%|                                                  |")
-     (format stream "~%|               ~% O vencedor é: ~a!               |" vencedor)
+     (format stream "~%|               ~% O vencedor e: ~a!               |" vencedor)
      (format stream "~%|                                                  |")
      (format stream "~%|              ~% Jogador 1: ~a pontos             |" pontos-j1)
      (format stream "~%|              ~% Jogador 2: ~a pontos             |" pontos-j2)
