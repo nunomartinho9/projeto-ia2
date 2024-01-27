@@ -280,7 +280,7 @@
   "Mostra o menu de escolha do jogador que começa o jogo."
   (progn
    (format t "~%o                                                  o")
-   (format t "~%|          - Escolha quem começa o jogo -          |")
+   (format t "~%|          - Escolha quem comeca o jogo -          |")
    (format t "~%|                                                  |")
    (format t "~%|                  1 - Humano                      |")
    (format t "~%|                  2 - CPU                         |")
@@ -358,7 +358,7 @@
             (format stream "~%|                                                  |")
             (format stream "~%|            Modo de Jogo: ~a           |" modo)
             (if iniciante
-                (format stream "~%|            1.º a jogar: ~a                   |" iniciante)
+                (format stream "~%|            1.o a jogar: ~a                   |" iniciante)
                 (continue)
             )
             (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
@@ -406,7 +406,7 @@
      (format stream "~%|                - Jogo do Cavalo -                |")
      (format stream "~%|                Partida terminada.                |")
      (format stream "~%|                                                  |")
-     (format stream "~%|               ~% O vencedor é: ~a!               |" vencedor)
+     (format stream "~%|               ~% O vencedor e: ~a!               |" vencedor)
      (format stream "~%|                                                  |")
      (format stream "~%|              ~% Jogador 1: ~a pontos             |" pontos-j1)
      (format stream "~%|              ~% Jogador 2: ~a pontos             |" pontos-j2)
