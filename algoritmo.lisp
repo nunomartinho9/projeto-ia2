@@ -36,7 +36,7 @@
          (tempo-decorrido (obter-tempo-gasto tempo-inicial))) ;; obter quanto tempo passou
     (cond
      ((or (= d-maximo 0) (= (length lista-expandidos) 0) (>= tempo-decorrido (/ tempo-limite 1000))) ;; se e' profundidade maxima, se e' no folha, se passou do tempo limite
-       (criar-no-solucao (if (= cor 1) no (inverter-sinal-no no fn-inverter-sinal-jogo)) ;; verificar se o no era min se sim, inverter o sinal
+       (criar-no-solucao (if (= cor 1) no (inverter-sinal-no no fn-inverter-sinal-jogo)) ;; verificar se o no era min se sim, inverter o sinal ;;todo: algo de errado n esta certo aqui
                          nos-analisados numero-cortes tempo-inicial)) ;; devolve o no com a jogada
      (T
        (negamax-aux         ;;aplicar o auxiliar do negamax para os sucessores

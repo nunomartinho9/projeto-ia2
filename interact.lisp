@@ -137,6 +137,7 @@
 
 (defun format-estado (solucao jogador &optional (stream t))
 
+  
   (let* ((no (car solucao))
          (tabuleiro (no-tabuleiro no))
          (pos (posicao-valor jogador tabuleiro))
@@ -144,12 +145,15 @@
          (coluna (cadr pos)))
 
     (progn
+     (format stream "~%-------------------------------------------------------------~%")
+     (format T "~%" )
      (format-tabuleiro-coord tabuleiro)
      (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
      (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no) (no-jogador2 no))
-     (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cdr solucao)))
-     (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cdr solucao)))
-     (format stream "~% Duracao da jogada: ~a" (solucao-tempo-gasto (cdr solucao)))
+     (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cadr solucao)))
+     (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cadr solucao)))
+     (format stream "~% Duracao da jogada: ~a~%" (solucao-tempo-gasto (cadr solucao)))
+     (format stream "~%-------------------------------------------------------------~%")
      (format stream "~%~%"))))
 
 
