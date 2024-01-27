@@ -60,11 +60,12 @@
             (profund-max (opcao-profund-max))
         )
         (progn
-            (escrever-log 'log-inicio '("Humano vs CPU" iniciante tempo-limite profund-max))
+            (escrever-log 'log-inicio (list "Humano vs CPU" iniciante tempo-limite profund-max))
+            #|
             (case iniciante
-                ('1 (hvc tempo-limite profund-max -2))
-                ('2 (hvc tempo-limite profund-max -1))
-            )
+                ('Humano (hvc tempo-limite profund-max -2))
+                ('CPU (hvc tempo-limite profund-max -1))
+            ) |#
         )
     )
 )
@@ -76,7 +77,7 @@
             (profund-max (opcao-profund-max))
         )
         (progn
-            (escrever-log 'log-inicio '("CPU vs CPU" nil tempo-limite))
+            (escrever-log 'log-inicio (list "CPU vs CPU" nil tempo-limite profund-max))
             (cvc tempo-limite profund-max -1)
             (log-fim)
         ) 
@@ -145,11 +146,11 @@
     (progn
         (menu-iniciante)
         (let ((opcao (read)))
-            (case opcao
+            (cond
                 ('1 'Humano)
                 ('2 'CPU)
                 ('0 (iniciar))
-                (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-iniciante)))    
+                (t (progn (format t "Escolha uma opcao valida!") (opcao-iniciante)))    
             )
         )
     )
@@ -165,7 +166,7 @@
                     tempo
                 )
                 ((eq tempo 0) (opcao-iniciante))
-                (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-tempo)))    
+                (t (progn (format t "Escolha uma opcao valida!") (opcao-tempo)))    
             )
         )
     )
@@ -289,7 +290,7 @@
 "Output de registos estatisticos do jogo no ecra e no ficheiro."
     (progn    
         (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
-            (funcall fn stream &rest dados)
+            (funcall fn stream dados)
             (finish-output stream)
             (close stream)
         )
@@ -330,10 +331,10 @@
             (format stream "~%|                                                  |")
             (format stream "~%|            Modo de Jogo: ~a           |" modo)
             (if iniciante
-                (format stream "~%|            1.º a jogar: ~a               |" iniciante)
+                (format stream "~%|            1.º a jogar: ~a                   |" iniciante)
                 (continue)
             )
-            (format stream "~%|            Tempo limite para o CPU: ~a ms        |" tempo-limite)
+            (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
             (format stream "~%|                                                  |")
             (format stream "~%o                                                  o")
             (format stream "~%~%")
@@ -341,7 +342,7 @@
     )
 )
 
-(defun log-jogada (stream no-atual jogada)
+(defun log-jogada (stream dados)
 "Output de dados da jogada."
     (let* (
             (linha ())
