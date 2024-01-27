@@ -46,6 +46,11 @@
 
 ;; ============= INTERACAO =============
 
+;; <no>::= (<tabuleiro> <pai> <f> pontos1 pontos2)
+;; <jogada>::= (<jogador> <linha> <coluna>)
+;; <solucao>::= (<no-jogada> (<nos-analisados> <n-cortes> <tempo-gasto>))
+;; ((<tabuleiro> <jogada>) (<tabuleiro> <jogada>) (<tabuleiro> <jogada>) (<tabuleiro> <jogada>))
+
 
 (defun modo-hvc ()
 "Executa o modo de jogo Humano vs Computador."
@@ -78,17 +83,40 @@
     )
 )
 
+;; <no>::= (<tabuleiro> <pai> <f> pontos1 pontos2) ;; f -> funcao-avaliacao
+;; <jogada>::= (<jogador> <linha> <coluna>)
+;; <solucao>::= (<no-jogada> (<nos-analisados> <n-cortes> <tempo-gasto>))
+
 ;; Jogador 1 (CPU): -1 | Jogador 2 (Humano): -2
 
-(defun hvc (tempo-limite profund-max jogador &optional (no-atual ())) ;; add fn construir-no ao optional 
+(defun hvc (tempo-limite profund-max jogador &optional (no-atual (criar-no (tabuleiro-aleatorio)))) ;; add fn construir-no ao optional 
 "Executa o decorrer do jogo Humano vs CPU."
     (let* (
-            (tabuleiro-atual ())
-            ()
+            (tabuleiro-atual (first no-atual))
+            (humano-possiveis (length (gerar-sucessores no-atual -2)))
+            (cpu-possiveis (length (gerar-sucesores no-atual -1)))
+            (pontos-humano (fourth no-atual))
+            (pontos-cpu (fifth no-atual))            
         )
-        (cond ;;(() escrever-log 'log-fim no-atual)
+        (cond ;;((and (eq jogadas-cpu 0) (eq jogadas-humano 0)) escrever-log 'log-fim no-atual)
               ((eq jogador -2) ;; jogada Humano
-                ()
+                (if (eq humano-possiveis 0)
+                    (progn
+                        (format t "~% Nao tem mais jogadas possiveis! ~%")
+                        (hvc tempo-limite profund-max +1 no-atual)
+                    )
+                    (let* ((posicao-selecionada (opcao-coordenadas tabuleiro-atual))
+                            (tabuleiro-jogada ()) ;; funcao colocar peca
+                            (pontos-atuais-h (fourth no-atual))
+                            (pontos-atuais-c (fifth no-atual))
+                        )
+                        (progn
+                            (format t "~%~% Jogada na posicao (~a, ~a). ~%~%" (first posicao-jogada) (second posicao-jogada))
+                            (escrever-ficheiro 'log-jogada '()) ;; todo - enviar dados log para funcao
+                            (hvc tempo-limite profund-max +1 (criar-no tabuleiro-jogada nil pontos-atuais-h pontos-atuais-c))
+                        )
+                    )
+                )
               )
               (t ;; jogada CPU
                 ()
@@ -101,6 +129,8 @@
 "Executa o decorrer do jogo CPU vs CPU."
     (let* (
             (tabuleiro-atual ())
+            (jogadas-cpu1 (length (gerar-sucessores no-atual -1)))
+            (jogadas-cpu2 (length (gerar-sucesores no-atual -2)))
         )
         (cond ;;(() escrever-log 'log-fim no-atual)
               (t ;; jogada CPU
@@ -147,47 +177,40 @@
         (profund-max-menu)
         (let ((profund-max (read)))
             (cond  
-                ((> profund-max 0) 
+                ((> profund-max 0)
                     profund-max
                 )
                 ('0 (opcao-tempo))
-                (otherwise (progn (format t "Escolha uma opcao valida!") (opcao-profund-max)))
+                (t (progn (format t "Escolha uma opcao valida!") (opcao-profund-max)))
             )
         )
     )
 )
 
-(defun opcao-linha ()
-"Recebe do Humano a opcao de linha para a jogada."
+(defun opcao-coordenadas (tabuleiro)
+"Recebe do utilizador a posicao na qual ele pretende jogar."
     (progn
-        (format t "~%~% Linha >> ")
+        (menu-jogada)
+        (format t "~% Linha: ")
         (let ((linha (read)))
-            (case linha
-                ((and (>= linha 1) (<= linha 10)) 
-                    linha
+            (cond ((and (numberp linha) (>= linha 0) (<= linha 9))
+                    (t (append linha))
                 )
-                ('0
-                    (opcao-iniciante)
+                (progn
+                    (format t "~% Posicao invalida. Tente novamente!")
+                    (opcao-coordenadas)
                 )
-                (otherwise (progn (format t "Escolha uma linha valida!") (opcao-linha)))    
             )
         )
-    )
-)
-
-(defun opcao-coluna ()
-"Recebe do Humano a opcao de coluna para a jogada."
-    (progn
-        (format t "~%~% Coluna >> ")
+        (format t "~% Coluna: ")
         (let ((coluna (read)))
-            (case coluna
-                ((and (>= coluna 1) (<= coluna 10)) 
-                    coluna
+            (cond ((and (numberp coluna) (>= coluna 0) (<= coluna 9))
+                    (t (append coluna))
                 )
-                ('0
-                    (opcao-iniciante)
+                (progn
+                    (format t "~% Posicao invalida. Tente novamente!")
+                    (opcao-coordenadas)
                 )
-                (otherwise (progn (format t "Escolha uma coluna valida!") (opcao-coluna)))    
             )
         )
     )
@@ -255,21 +278,30 @@
 
 (defun menu-jogada ()
 "Mostra o menu de jogada do Humano."
-    (format t "~%Defina as coordenadas para a sua jogada.")
+    (format t "~%Defina as coordenadas (linha, coluna) para a sua jogada.")
 )
 
 
 ;; ============= ESTATISTICAS =============
 
 (defun escrever-log (fn dados)
-"Output de registos estatisticos do jogo."
+"Output de registos estatisticos do jogo no ecra e no ficheiro."
     (progn    
         (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
-            (funcall fn stream dados)
+            (funcall fn stream &rest dados)
             (finish-output stream)
             (close stream)
         )
         (funcall fn t dados)
+    )
+)
+
+(defun escrever-ficheiro (fn dados)
+"Output de registos estatisticos do jogo no ficheiro."
+    (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
+        (funcall fn stream dados)
+        (finish-output stream)
+        (close stream)
     )
 )
 
@@ -308,11 +340,9 @@
     )
 )
 
-(defun log-jogada (stream dados)
+(defun log-jogada (stream no-atual jogada)
 "Output de dados da jogada."
     (let* (
-            (no-atual ())
-            (jogada ())
             (linha ())
             (coluna ())
             (jogador ())
@@ -321,7 +351,6 @@
             (nos-analisados ())
             (num-cortes ())
             (tempo-jogada ())
-            (tabuleiro-atual ())
            )
         (progn
             ();; tabuleiro
@@ -338,19 +367,19 @@
 (defun log-fim (stream dados)
 "Mostra o resultado do jogo."
     (let* (
-            (vencedor ())
             (pontos-j1 ())
             (pontos-j2 ())
+            (vencedor ())
         )
         (progn
             (format stream "~%o                                                  o")
             (format stream "~%|                - Jogo do Cavalo -                |")
             (format stream "~%|                Partida terminada.                |")
             (format stream "~%|                                                  |")
-            (format stream "~%|               ~% O vencedor é: ~a!               |")
+            (format stream "~%|               ~% O vencedor é: ~a!               |" vencedor)
             (format stream "~%|                                                  |")
-            (format stream "~%|              ~% Jogador 1: ~a pontos             |")
-            (format stream "~%|              ~% Jogador 2: ~a pontos             |")
+            (format stream "~%|              ~% Jogador 1: ~a pontos             |" pontos-j1)
+            (format stream "~%|              ~% Jogador 2: ~a pontos             |" pontos-j2)
             (format stream "~%|                                                  |")
             (format stream "~%o                                                  o")
             (format stream "~%~% ")
