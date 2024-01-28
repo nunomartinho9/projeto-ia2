@@ -371,6 +371,7 @@
          (tempo-limite (third dados)))
     (progn
      (format stream "~%o ----------------------------------------------- o")
+     (format stream "~%                                                  ")
      (format stream "~%                - Jogo do Cavalo -                ")
      (format stream "~%                 Partida iniciada.                ")
      (format stream "~%                                                  ")
@@ -393,13 +394,14 @@
     )
   (progn
      (format stream "~%o ----------------------------------------------- o")
+     (format stream "~%                                                  ")
      (format stream "~%                - Jogo do Cavalo -               ")
      (format stream "~%                Partida terminada.               ")
      (format stream "~%                                                 ")
      (format stream "~%                 O vencedor e: ~a!               " vencedor)
      (format stream "~%                                                 ")
-     (format stream "~%                   ~a: ~a pontos                 " jogador1-text pontos-j1)
-     (format stream "~%                   ~a: ~a pontos                 " jogador2-text pontos-j2)
+     (format stream "~%                  ~a: ~a pontos                  " jogador1-text pontos-j1)
+     (format stream "~%                  ~a: ~a pontos                  " jogador2-text pontos-j2)
      (format stream "~%                                                 ")
      (format stream "~%o ----------------------------------------------- o")
      (format stream "~%~%")
@@ -407,7 +409,7 @@
 
 (defun log-vencedor-hvc (no &optional (stream t))
 "Output de dados do final do jogo HvC no ecra e ficheiro."
-  (escrever-log 'log-vencedor no "Humano" "CPU" stream))
+  (escrever-log 'log-vencedor no "CPU" "Humano" stream))
 
 (defun log-vencedor-cvc (no &optional (stream t))
 "Output de dados do final do jogo CvC no ecra e ficheiro."
