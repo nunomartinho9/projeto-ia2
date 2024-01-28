@@ -3,8 +3,8 @@
 ;; Ano letivo 23/24
 
 (defun diretorio ()
-  ;;"C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
-  "U:/Documents/LEI/AnoCorrente/IA/projeto_2/" ;altera a pasta para o novo diretorio
+  "C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
+  ;;"U:/Documents/LEI/AnoCorrente/IA/projeto_2/" ;altera a pasta para o novo diretorio
 )
 
 (compile-file (concatenate 'string (diretorio) "algoritmo.lisp"))
@@ -160,11 +160,8 @@
      (format stream "~%-------------------------------------------------------------~%")
      (format stream "~%" )
      (format-tabuleiro-coord tabuleiro stream)
-     (if (eql jogador -1)
-        (format stream "~% O CPU jogou na posicao (~a, ~a)." linha coluna)
-        (format stream "~% O Humano jogou na posicao (~a, ~a)." linha coluna)
-     )
-     (format stream "~% Pontos atuais: CPU - ~a pontos | Humano - ~a pontos" (no-jogador1 no) (no-jogador2 no))
+     (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
+     (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no) (no-jogador2 no))
      (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cadr solucao)))
      (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cadr solucao)))
      (format stream "~% Duracao da jogada: ~a~%" (solucao-tempo-gasto (cadr solucao)))
@@ -202,6 +199,7 @@
                                (let ((no-solucao (negamax no-atual tempo-limite profund-max -2)))
                                  (progn
                                   (format-estado no-solucao -2)
+                                  (escrever-log-jogada no-solucao -2)
                                   (cvc tempo-limite profund-max -1 
                                        
                                        (criar-no (no-tabuleiro (car no-solucao)) 
@@ -228,6 +226,7 @@
                      (let ((no-solucao (negamax no-atual tempo-limite profund-max -1)))
                        (progn
                         (format-estado no-solucao -1)
+                        (escrever-log-jogada no-solucao -1)
                         (cvc tempo-limite profund-max -2 
                          
                                                                 (criar-no (no-tabuleiro (car no-solucao)) 
