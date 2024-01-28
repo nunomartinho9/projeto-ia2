@@ -122,7 +122,7 @@
                                           )
                                       (progn
                                       ;;(format t "~%~% Jogada na posicao (~a, ~a). ~%~%" (first posicao-selecionada) (second posicao-selecionada))
-                                      (escrever-log-jogada (list no-solucao) -2 nil)
+                                      (escrever-log-jogada (list no-solucao) -2)
                                       (hvc tempo-limite profund-max -1 no-solucao)))
 
                                      (progn
@@ -134,7 +134,7 @@
 
                  (let ((no-solucao (negamax no-atual tempo-limite profund-max)))
                    (progn
-                    (escrever-log-jogada no-solucao -1 "cpu")
+                    (escrever-log-jogada no-solucao -1)
                     (hvc tempo-limite profund-max -2 (car no-solucao))))
                  (progn
                   (format t "~%-------------------------------------------------------------~%")
@@ -175,7 +175,7 @@
                            (if cpu1-pode-mover
                                (let ((no-solucao (negamax no-atual tempo-limite profund-max)))
                                  (progn
-                                  (escrever-log-jogada no-solucao -1 "cpu")
+                                  (escrever-log-jogada no-solucao -1)
                                   (cvc tempo-limite profund-max -2 (car no-solucao))))
                                (progn
                                 (format t "~%-------------------------------------------------------------~%")
@@ -197,7 +197,7 @@
                                   (solucao-tempo-gasto (cadr no-solucao)))))
                   )
                    (progn
-                    (escrever-log-jogada inverter-dados -2 "cpu")
+                    (escrever-log-jogada inverter-dados -2)
                     (cvc tempo-limite profund-max -1 inverter-sinal)))
                  (progn
                   (format t "~%-------------------------------------------------------------~%")
@@ -325,7 +325,7 @@
     (close stream)) ;; escrever no ficheiro log.dat
 )
 
-(defun format-estado (solucao jogador nome-jogador &optional (stream t))
+(defun format-estado (solucao jogador &optional (stream t))
   "Output de registos estatisticos da jogada no ecra."
   (let* ((no (car solucao))
          (tabuleiro (no-tabuleiro no))
@@ -339,20 +339,16 @@
      (format-tabuleiro-coord tabuleiro stream)
      (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
      (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no) (no-jogador2 no))
-     (if (string-equal nome-jogador "cpu")
-      (progn
-        (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cadr solucao)))
-        (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cadr solucao)))
-        (format stream "~% Duracao da jogada: ~a~%" (solucao-tempo-gasto (cadr solucao))))
-      (continue) 
-     )
+     (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cadr solucao)))
+     (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cadr solucao)))
+     (format stream "~% Duracao da jogada: ~a~%" (solucao-tempo-gasto (cadr solucao)))
      (format stream "~%-------------------------------------------------------------~%"))))
 
-(defun escrever-log-jogada (solucao jogador nome-jogador)
+(defun escrever-log-jogada (solucao jogador)
   "Output de registos estatisticos da jogada no ficheiro."
-  (format-estado solucao jogador nome-jogador)
+  (format-estado solucao jogador)
   (with-open-file (stream (concatenate 'string (diretorio) "log.dat") :direction :output :if-does-not-exist :create :if-exists :append)
-    (format-estado solucao jogador nome-jogador stream)
+    (format-estado solucao jogador stream)
     (finish-output stream)
     (close stream)))
 
@@ -390,7 +386,10 @@
      (format stream "~%                - Jogo do Cavalo -               ")
      (format stream "~%                Partida terminada.               ")
      (format stream "~%                                                 ")
-     (format stream "~%                 O vencedor e: ~a!               " vencedor)
+     (format stream "~%             O vencedor e: ~a!                   " 
+      (if (eql vencedor -1)
+         jogador1-text
+         jogador2-text))
      (format stream "~%                                                 ")
      (format stream "~%                  ~a: ~a pontos                  " jogador1-text pontos-j1)
      (format stream "~%                  ~a: ~a pontos                  " jogador2-text pontos-j2)
