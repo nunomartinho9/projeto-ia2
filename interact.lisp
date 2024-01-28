@@ -134,11 +134,20 @@
                      (let ((no-solucao (negamax no-atual tempo-limite profund-max)))
                        (progn
                         (format-estado no-solucao -1)
-                        (hvc tempo-limite profund-max -2 (car no-solucao)))))))))))
+                        (hvc tempo-limite profund-max -2 (car no-solucao))))
+                     (progn
+                                    (format t "~%-------------------------------------------------------------~%")
+                                    (format-tabuleiro-coord tabuleiro-atual)
+                                    (format t "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no-atual) (no-jogador2 no-atual))
+                                    (format t "~% CPU Nao tem mais jogadas possiveis! ~%")
+                                    (format t "~%-------------------------------------------------------------~%")
+                                    (hvc tempo-limite profund-max -2 no-atual))
+                     )))))))
 
 
 (defun format-estado (solucao jogador &optional (stream t))
 
+  
   (let* ((no (car solucao))
          (tabuleiro (no-tabuleiro no))
          (pos (posicao-valor jogador tabuleiro))
@@ -146,12 +155,15 @@
          (coluna (cadr pos)))
 
     (progn
+     (format stream "~%-------------------------------------------------------------~%")
+     (format T "~%" )
      (format-tabuleiro-coord tabuleiro)
      (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
      (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no) (no-jogador2 no))
-     (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cdr solucao)))
-     (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cdr solucao)))
-     (format stream "~% Duracao da jogada: ~a" (solucao-tempo-gasto (cdr solucao)))
+     (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cadr solucao)))
+     (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cadr solucao)))
+     (format stream "~% Duracao da jogada: ~a~%" (solucao-tempo-gasto (cadr solucao)))
+     (format stream "~%-------------------------------------------------------------~%")
      (format stream "~%~%"))))
 
 

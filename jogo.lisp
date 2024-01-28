@@ -187,29 +187,36 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
 
 (defun primeira-jogada-j1 (tabuleiro)
   (let* ((pos-maior-valor-1linha (pos-valor-mais-alto tabuleiro 0))
-        (novo-tabuleiro (substituir (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro jogador-1))
-        )
-    (list novo-tabuleiro (celula (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro) jogador-1)
-    )
-  )
+         (novo-tabuleiro (substituir (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro jogador-1)))
+    (list novo-tabuleiro (celula (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro) jogador-1)))
 
 (defun primeira-jogada-j2 (tabuleiro)
   (let* ((pos-maior-valor-linha (pos-valor-mais-alto tabuleiro 9))
-        (novo-tabuleiro (substituir (car pos-maior-valor-linha) (cadr pos-maior-valor-linha) tabuleiro jogador-2))
-        )
-    (list novo-tabuleiro (celula (car pos-maior-valor-linha) (cadr pos-maior-valor-linha) tabuleiro) jogador-2)
-    )
-  )
+         (novo-tabuleiro (substituir (car pos-maior-valor-linha) (cadr pos-maior-valor-linha) tabuleiro jogador-2)))
+    (list novo-tabuleiro (celula (car pos-maior-valor-linha) (cadr pos-maior-valor-linha) tabuleiro) jogador-2)))
 
+;;asd
 (defun primeiras-jogadas (tabuleiro)
   "Devolve o tabuleiro com as pecas metidas"
 
-  (let ((pos-maior-valor-1linha (pos-valor-mais-alto tabuleiro 0))
-        (pos-maior-valor-2linha (pos-valor-mais-alto tabuleiro 9)))
+  (let* ((pos-maior-valor-1linha (pos-valor-mais-alto tabuleiro 0))
+         (pos-maior-valor-2linha (pos-valor-mais-alto tabuleiro 9))
+         (tabuleiroJogada (substituir (car pos-maior-valor-2linha) (cadr pos-maior-valor-2linha) (substituir (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro jogador-1) jogador-2))
+         (duplos-list (posicao-duplos tabuleiroJogada))
+         (duplo (if duplos-list
+                    (nth (random (length duplos-list)) duplos-list)
+                    nil))
+         (valorj1 (celula (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro))
+         (valorj2 (celula (car pos-maior-valor-2linha) (cadr pos-maior-valor-2linha) tabuleiro)))
 
-    (substituir (car pos-maior-valor-2linha) (cadr pos-maior-valor-2linha)
+    (let ((tabuleiro-com-valor1
+           (if (duplop valorj1)
+               (substituir (car duplo) (cadr duplo) tabuleiroJogada)
+               (eliminar-simetrico valorj1 tabuleiroJogada))))
 
-                (substituir (car pos-maior-valor-1linha) (cadr pos-maior-valor-1linha) tabuleiro jogador-1) jogador-2)))
+      (if (duplop valorj2)
+          (substituir (car duplo) (cadr duplo) tabuleiro-com-valor1)
+          (eliminar-simetrico valorj2 tabuleiro-com-valor1)))))
 
 
 ;;(contar-casas-validas (linha 0 (tabuleiro-teste)))
@@ -322,7 +329,7 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
           (if (duplop novaPosicaoJogador)
               (list (substituir (car duplo) (cadr duplo) tabuleiroJogada) novaPosicaoJogador jogador)
               (list (eliminar-simetrico novaPosicaoJogador tabuleiroJogada) novaPosicaoJogador jogador)))
-        
+
         NIL)))
 
 
@@ -468,7 +475,7 @@ funcao devera retornar o tabuleiro com a celula substituida pelo valor pretendid
   (format stream "~5a" "") ; Espaço para a coluna vazia no início
   (loop for i from 0 to (1- (length (first tabuleiro)))
         do (format stream "~5d" i)) ; Imprimir coordenadas das colunas
-  (format stream "~2%")
+  (format stream "~%")
 
   (format stream "~%")
   (loop for linha in tabuleiro
