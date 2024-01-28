@@ -130,7 +130,11 @@
                         (format-estado no-solucao -1)
                         (hvc tempo-limite profund-max -2 (car no-solucao))))
                      (progn
+                                    (format t "~%-------------------------------------------------------------~%")
+                                    (format-tabuleiro-coord tabuleiro-atual)
+                                    (format t "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no-atual) (no-jogador2 no-atual))
                                     (format t "~% CPU Nao tem mais jogadas possiveis! ~%")
+                                    (format t "~%-------------------------------------------------------------~%")
                                     (hvc tempo-limite profund-max -2 no-atual))
                      )))))))
 
