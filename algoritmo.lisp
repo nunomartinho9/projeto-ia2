@@ -12,74 +12,79 @@
 (defun negamax (no
                 tempo-limite
                 &optional
-                (d-maximo 50)                                       ;; profundidade default e' 50
-                (cor 1)                                             ;; começar com no max
-                (alfa most-negative-fixnum)                         ;; comecar o alfa a -infinito
-                (beta most-positive-fixnum)                         ;; comecar o beta a +infinito
-                (tempo-inicial (get-universal-time))                ;; tempo que comeca o algoritmo
-                (nos-analisados 1)                                  ;; nos analisados
-                (numero-cortes 0)                                   ;; numero de cortes
-                (fn-expandir-no 'usar-operadores)                   ;; funcao geral para expandir o no
-                (peca-jogador1 -1)                                  ;; peca do jogador 1 (max)
-                (fn-selecionar-problema 'resultado-tabuleiro)       ;; funcao geral para ir buscar o tabuleiro do resulado
-                (fn-selecionar-pontos 'resultado-pontos)            ;; funcao geral para ir buscar os pontos do resulado
+                (d-maximo 50) ;; profundidade default e' 50
+                (peca-jogador1 -1) ;; peca do jogador 1 (max)
+                (cor 1) ;; começar com no max
+                (alfa most-negative-fixnum) ;; comecar o alfa a -infinito
+                (beta most-positive-fixnum) ;; comecar o beta a +infinito
+                (tempo-inicial (get-universal-time)) ;; tempo que comeca o algoritmo
+                (nos-analisados 1) ;; nos analisados
+                (numero-cortes 0) ;; numero de cortes
+                (fn-expandir-no 'usar-operadores) ;; funcao geral para expandir o no
+                (fn-selecionar-problema 'resultado-tabuleiro) ;; funcao geral para ir buscar o tabuleiro do resulado
+                (fn-selecionar-pontos 'resultado-pontos) ;; funcao geral para ir buscar os pontos do resulado
                 (fn-inverter-sinal-jogo 'inverter-sinal-tabuleiro)) ;; funcao geral para inverter o tabuleiro (proprio para o negamax)
   "Executa o algoritmo negamax para um no"
   (let* ((lista-expandidos (ordenar-negamax (gerar-sucessores
-                                              no
-                                              cor
-                                              fn-expandir-no
-                                              peca-jogador1
-                                              fn-selecionar-problema
-                                              fn-selecionar-pontos)
+                                             no
+                                             cor
+                                             fn-expandir-no
+                                             peca-jogador1
+                                             fn-selecionar-problema
+                                             fn-selecionar-pontos)
                                             cor))
          (tempo-decorrido (obter-tempo-gasto tempo-inicial))) ;; obter quanto tempo passou
     (cond
      ((or (= d-maximo 0) (= (length lista-expandidos) 0) (>= tempo-decorrido (/ tempo-limite 1000))) ;; se e' profundidade maxima, se e' no folha, se passou do tempo limite
-       (criar-no-solucao (if (= cor 1) no (inverter-sinal-no no fn-inverter-sinal-jogo)) ;; verificar se o no era min se sim, inverter o sinal ;;todo: algo de errado n esta certo aqui
-                         nos-analisados numero-cortes tempo-inicial)) ;; devolve o no com a jogada
+                                                                                                    (criar-no-solucao (if (= cor 1) no (inverter-sinal-no no fn-inverter-sinal-jogo)) ;; verificar se o no era min se sim, inverter o sinal ;;todo: algo de errado n esta certo aqui
+                                                                                                                      nos-analisados numero-cortes tempo-inicial)) ;; devolve o no com a jogada
      (T
-       (negamax-aux         ;;aplicar o auxiliar do negamax para os sucessores
-         no
-         lista-expandidos
-         tempo-limite
-         d-maximo
-         cor
-         alfa
-         beta
-         tempo-inicial
-         nos-analisados
-         numero-cortes
-         fn-inverter-sinal-jogo)))))
+       (negamax-aux ;;aplicar o auxiliar do negamax para os sucessores
+                   no
+                   lista-expandidos
+                   tempo-limite
+                   d-maximo
+                   peca-jogador1
+                   cor
+                   alfa
+                   beta
+                   tempo-inicial
+                   nos-analisados
+                   numero-cortes
+                   fn-inverter-sinal-jogo)))))
 ;; ============= AUXILIARES NEGAMAX =============
 (defun negamax-aux (no-pai
-                     sucessores
-                     tempo-limite
-                     d-maximo
-                     cor
-                     alfa
-                     beta
-                     tempo-inicial
-                     nos-analisados
-                     numero-cortes
-                     fn-inverter-sinal-jogo)
+                    sucessores
+                    tempo-limite
+                    d-maximo
+                    peca-jogador1
+                    cor
+                    alfa
+                    beta
+                    tempo-inicial
+                    nos-analisados
+                    numero-cortes
+                    fn-inverter-sinal-jogo)
   "Negamax Auxiliar"
   (cond
    ((= (length sucessores) 1) ;; so tem 1 no
-     (negamax                 ;; inverter negamax
-       (inverter-sinal-no (car sucessores) fn-inverter-sinal-jogo)
-       tempo-limite
-       (1- d-maximo)
-       (- cor)
-       (- beta)
-       (- alfa)
-       tempo-inicial
-       (1+ nos-analisados)
-       numero-cortes))
+                             (negamax ;; inverter negamax
+                                     (inverter-sinal-no (car sucessores) fn-inverter-sinal-jogo)
+                                     tempo-limite
+                                     (1- d-maximo)
+                                     peca-jogador1
+                                     (- cor)
+                                     (- beta)
+                                     (- alfa)
+                                     tempo-inicial
+                                     (1+ nos-analisados)
+                                     numero-cortes))
    (T
      (let* ((solucao (negamax (inverter-sinal-no (car sucessores) fn-inverter-sinal-jogo)
                               tempo-limite
                               (1- d-maximo)
+                              peca-jogador1
+
                               (- cor)
                               (- beta)
                               (- alfa)
@@ -89,26 +94,25 @@
 
             (no-solucao (car solucao)) ;; vai buscar o no de uma solucao encontrada
             (melhor-valor (max-no-f no-solucao no-pai)) ;; compara os valores de f e guarda o no com o f mais alto
-            (novo-alfa (max alfa (no-f melhor-valor)))  ;; atualiza o alfa
-            (nos-analisados-solucao (solucao-nos-analisados (cadr solucao)))  ;; nos analisados da solucao
-            (numero-cortes-solucao (solucao-numero-cortes (cadr solucao))))   ;; numero de cortes da solucao
+            (novo-alfa (max alfa (no-f melhor-valor))) ;; atualiza o alfa
+            (nos-analisados-solucao (solucao-nos-analisados (cadr solucao))) ;; nos analisados da solucao
+            (numero-cortes-solucao (solucao-numero-cortes (cadr solucao)))) ;; numero de cortes da solucao
        (if (>= novo-alfa beta) ;;corte
            (criar-no-solucao no-pai nos-analisados-solucao (1+ numero-cortes-solucao) tempo-inicial)
-           
+
            ;;nao tem corte
-           (negamax-aux no-pai 
-                        (cdr sucessores) 
-                        tempo-limite 
-                        d-maximo 
-                        cor 
-                        novo-alfa 
-                        beta 
-                        tempo-inicial 
-                        nos-analisados-solucao 
+           (negamax-aux no-pai
+                        (cdr sucessores)
+                        tempo-limite
+                        d-maximo
+                        peca-jogador1
+                        cor
+                        novo-alfa
+                        beta
+                        tempo-inicial
+                        nos-analisados-solucao
                         numero-cortes-solucao
-                        fn-inverter-sinal-jogo)
-           
-           )))))
+                        fn-inverter-sinal-jogo))))))
 
 (defun ordenar-negamax (lista-nos cor)
   "Ordena uma lista executando o algoritmo quicksort"
@@ -178,21 +182,21 @@
 
   ;;(let ((jogador (if (= cor 1) peca-jogador1 peca-jogador2)))
 
-    (mapcar #'(lambda (resultado)
-                (let* ((pontos1 (if (= cor 1)
-                                    (+ (no-jogador1 no-atual) (funcall fn-selecionar-pontos resultado))
-                                    (no-jogador1 no-atual)))
-                       (pontos2 (if (= cor -1)
-                                    (+ (no-jogador2 no-atual) (funcall fn-selecionar-pontos resultado))
-                                    (no-jogador2 no-atual))))
+  (mapcar #'(lambda (resultado)
+              (let* ((pontos1 (if (= cor 1)
+                                  (+ (no-jogador1 no-atual) (funcall fn-selecionar-pontos resultado))
+                                  (no-jogador1 no-atual)))
+                     (pontos2 (if (= cor -1)
+                                  (+ (no-jogador2 no-atual) (funcall fn-selecionar-pontos resultado))
+                                  (no-jogador2 no-atual))))
 
-                  (criar-no
-                    (funcall fn-selecionar-problema resultado)
-                    no-atual
-                    (abs (- pontos1 pontos2))
-                    pontos1
-                    pontos2)))
-      (funcall fn-expandir-no (no-tabuleiro no-atual) peca-jogador1)))
+                (criar-no
+                 (funcall fn-selecionar-problema resultado)
+                 no-atual
+                 (abs (- pontos1 pontos2))
+                 pontos1
+                 pontos2)))
+    (funcall fn-expandir-no (no-tabuleiro no-atual) peca-jogador1)))
 
 
 ;; (inverter-sinal-no (no-teste) 'inverter-sinal-tabuleiro)
@@ -252,8 +256,3 @@
 
 (defun solucao-tempo-gasto (no-solucao-semjogada)
   (third no-solucao-semjogada))
-
-
-
-
-

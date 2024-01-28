@@ -30,11 +30,8 @@
          (modo-cvc)
          (iniciar)))
        (0
-        (progn
-         (format t "Obrigado por jogar!~%~%")
-         (clear-input)
-         (clear-output)
-         (finish-output)))
+        (format t "Obrigado por jogar!~%~%")
+       )
        (t (progn (format t "Escolha uma opcao valida!") (iniciar)))))))
 
 
@@ -48,14 +45,23 @@
 
 (defun modo-hvc ()
   "Executa o modo de jogo Humano vs Computador."
-  (let* ((iniciante (opcao-iniciante))
-         (tempo-limite (opcao-tempo))
-         (profund-max (opcao-profund-max)))
     (progn
-     (escrever-log 'log-inicio (list "Humano vs CPU" iniciante tempo-limite profund-max))
-     (case iniciante
-       ('Humano (hvc tempo-limite profund-max -2))
-       ('CPU (hvc tempo-limite profund-max -1))))))
+        (menu-iniciante)
+        (let ((iniciante (read)))
+            (cond
+                ((and (not (numberp iniciante)) (or (> iniciante 2) (< iniciante 0))) 
+                    (progn (format t "Escolha uma opcao valida!") (modo-hvc)))
+                ((eql iniciante 0) (iniciar))
+                (t (let* ((tempo-limite (opcao-tempo))
+                            (profund-max (opcao-profund-max))
+                        )
+                        (case iniciante
+                            (1 (progn 
+                                    (escrever-log 'log-inicio (list "Humano vs CPU" 'Humano tempo-limite profund-max)) 
+                                    (hvc tempo-limite profund-max -2)))
+                            (2 (progn
+                                    (escrever-log 'log-inicio (list "Humano vs CPU" 'CPU tempo-limite profund-max)) 
+                                    (hvc tempo-limite profund-max -1))))))))))
 
 (defun modo-cvc ()
   "Executa o modo de jogo Computador vs Computador."
@@ -64,7 +70,8 @@
     (progn
      (escrever-log 'log-inicio (list "CPU vs CPU" nil tempo-limite profund-max))
      (cvc tempo-limite profund-max -1)
-     (log-fim))))
+     ;;(log-fim)
+     )))
 
 ;; <no>::= (<tabuleiro> <pai> <f> pontos1 pontos2) ;; f -> funcao-avaliacao
 ;; <jogada>::= (<jogador> <linha> <coluna>)
@@ -151,7 +158,7 @@
      (format T "~%")
      (format-tabuleiro-coord tabuleiro)
      (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
-     (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no) (no-jogador2 no))
+      (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no) (no-jogador2 no))
      (format stream "~% Nos analisados: ~a" (solucao-nos-analisados (cadr solucao)))
      (format stream "~% Numero de cortes: ~a" (solucao-numero-cortes (cadr solucao)))
      (format stream "~% Duracao da jogada: ~a~%" (solucao-tempo-gasto (cadr solucao)))
@@ -171,8 +178,8 @@
 
           (progn
            (format-tabuleiro-coord tabuleiro-com-jogadas)
-           (format t "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" (no-jogador1 no-atualizado) (no-jogador2 no-atualizado))
-           (hvc tempo-limite profund-max jogador no-atualizado)))
+           (format t "~% Pontos atuais: CPU1 - ~a pontos | CPU2 - ~a pontos"  (no-jogador1 no-atualizado) (no-jogador2 no-atualizado))
+           (cvc tempo-limite profund-max jogador no-atualizado)))
 
         (let* ((cpu1-pode-mover (jogador-pode-mover tabuleiro-atual -1))
                (cpu2-pode-mover (jogador-pode-mover tabuleiro-atual -2)))
@@ -186,33 +193,51 @@
            ((eq jogador -2) ;; cpu 2
 
                            (if cpu2-pode-mover
-                               (let ((no-solucao (negamax no-atual tempo-limite profund-max)))
+                               (let ((no-solucao (negamax no-atual tempo-limite profund-max -2)))
                                  (progn
                                   (format-estado no-solucao -2)
-                                  (hvc tempo-limite profund-max -1 (car no-solucao))))
+                                  (cvc tempo-limite profund-max -1 
+                                       
+                                       (criar-no (no-tabuleiro (car no-solucao)) 
+                                                 (no-pai (car no-solucao))
+                                                 (no-f (car no-solucao))
+                                                 (no-jogador2 (car no-solucao))
+                                                 (no-jogador1 (car no-solucao))
+                                                 )
+                                       
+                                       
+                                       )))
                                (progn
                                 (format t "~%-------------------------------------------------------------~%")
                                 (format-tabuleiro-coord tabuleiro-atual)
                                 (format t "~% Pontos atuais: CPU1 - ~a pontos | CPU2 - ~a pontos" (no-jogador1 no-atual) (no-jogador2 no-atual))
                                 (format t "~% CPU2 Nao tem mais jogadas possiveis! ~%")
                                 (format t "~%-------------------------------------------------------------~%")
-                                (hvc tempo-limite profund-max -1 no-atual))))
+                                (cvc tempo-limite profund-max -1 no-atual))))
            
            (t ;; jogada CPU
 
                  (if cpu1-pode-mover
 
-                     (let ((no-solucao (negamax no-atual tempo-limite profund-max)))
+                     (let ((no-solucao (negamax no-atual tempo-limite profund-max -1)))
                        (progn
                         (format-estado no-solucao -1)
-                        (hvc tempo-limite profund-max -2 (car no-solucao))))
+                        (cvc tempo-limite profund-max -2 
+                         
+                                                                (criar-no (no-tabuleiro (car no-solucao)) 
+                                                 (no-pai (car no-solucao))
+                                                 (no-f (car no-solucao))
+                                                 (no-jogador2 (car no-solucao))
+                                                 (no-jogador1 (car no-solucao))
+                                                 )
+                         )))
                      (progn
                       (format t "~%-------------------------------------------------------------~%")
                       (format-tabuleiro-coord tabuleiro-atual)
                       (format t "~% Pontos atuais: CPU1 - ~a pontos | CPU2 - ~a pontos" (no-jogador1 no-atual) (no-jogador2 no-atual))
                       (format t "~% CPU1 Nao tem mais jogadas possiveis! ~%")
                       (format t "~%-------------------------------------------------------------~%")
-                      (hvc tempo-limite profund-max -2 no-atual))))
+                      (cvc tempo-limite profund-max -2 no-atual))))
            )))))
 
 (defun opcao-iniciante ()
@@ -234,7 +259,7 @@
      (cond
       ((and (>= tempo 1000) (<= tempo 5000))
         tempo)
-      ((eql tempo 0) (opcao-iniciante))
+      ((eql tempo 0) (iniciar))
       (t (progn (format t "Escolha uma opcao valida!") (opcao-tempo)))))))
 
 (defun opcao-profund-max ()
@@ -291,10 +316,10 @@
    (format t "~%o                                                  o")
    (format t "~%|          - Escolha quem comeca o jogo -          |")
    (format t "~%|                                                  |")
-   (format t "~%|                  1 - Humano                      |")
-   (format t "~%|                  2 - CPU                         |")
+   (format t "~%|               1 - Humano (peca -2)               |")
+   (format t "~%|               2 - CPU (peca -1)                  |")
    (format t "~%|                                                  |")
-   (format t "~%|                  0 - Voltar                      |")
+   (format t "~%|               0 - Voltar ao inicio               |")
    (format t "~%o                                                  o")
    (format t "~%~%>> ")))
 
@@ -305,7 +330,7 @@
    (format t "~%|  - Defina o tempo limite para a jogada do CPU -  |")
    (format t "~%|           (1000 a 5000 milissegundos)            |")
    (format t "~%|                                                  |")
-   (format t "~%|                    0 - Voltar                    |")
+   (format t "~%|               0 - Voltar ao inicio               |")
    (format t "~%o                                                  o")
    (format t "~%~%>> ")))
 
@@ -315,7 +340,7 @@
    (format t "~%o                                                  o")
    (format t "~%|         - Defina a profundidade maxima -         |")
    (format t "~%|                                                  |")
-   (format t "~%|                     0 - Voltar                   |")
+   (format t "~%|               0 - Voltar ao inicio               |")
    (format t "~%o                                                  o")
    (format t "~%~%>> ")))
 
@@ -326,7 +351,7 @@
 
 ;; ============= ESTATISTICAS =============
 
-(defun escrever-log (fn dados)
+(defun escrever-log (fn &rest dados)
   "Output de registos estatisticos do jogo no ecra e no ficheiro."
   (progn
    (funcall fn t dados) ;; escrever no ecra
@@ -351,23 +376,28 @@
     (format nil "~ds" segundos)))
 
 (defun log-inicio (stream dados)
-  "Output de dados iniciais do jogo."
-  (let* ((modo (first dados))
-         (iniciante (second dados))
-         (tempo-limite (third dados)))
-    (progn
-     (format stream "~%o                                                  o")
-     (format stream "~%|                - Jogo do Cavalo -                |")
-     (format stream "~%|                 Partida iniciada.                |")
-     (format stream "~%|                                                  |")
-     (format stream "~%|            Modo de Jogo: ~a           |" modo)
-     (if iniciante
-         (format stream "~%|            1.o a jogar: ~a                   |" iniciante)
-         (continue))
-     (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
-     (format stream "~%|                                                  |")
-     (format stream "~%o                                                  o")
-     (format stream "~%~%"))))
+"Output de dados iniciais do jogo."
+    (let* ((modo (first dados))
+            (iniciante (second dados))
+            (tempo-limite (third dados))
+        )
+        (progn
+            (format stream "~%o                                                  o")
+            (format stream "~%|                - Jogo do Cavalo -                |")
+            (format stream "~%|                 Partida iniciada.                |")
+            (format stream "~%|                                                  |")
+            (format stream "~%|            Modo de Jogo: ~a           |" modo)
+            (if iniciante
+                (format stream "~%|            1.o a jogar: ~a                   |" iniciante)
+                (continue)
+            )
+            (format stream "~%|            Tempo limite do CPU: ~a ms            |" tempo-limite)
+            (format stream "~%|                                                  |")
+            (format stream "~%o                                                  o")
+            (format stream "~%~%")
+        )
+    )
+)
 
 (defun log-jogada (stream dados)
   "Output de dados da jogada."
@@ -381,9 +411,13 @@
          (num-cortes ())
          (tempo-jogada ()))
     (progn
+     (format stream "~%")
      (format-tabuleiro-coord tabuleiro stream)
-     (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
-     (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" pontos-j1 pontos-j2)
+     (if (eql jogador -2)
+        (format stream "~% O Humano jogou na posicao (~a, ~a)." linha coluna)
+        (format stream "~% O CPU jogou na posicao (~a, ~a)." linha coluna)
+     )
+     (format stream "~% Pontos atuais: Humano - ~a pontos | CPU - ~a pontos" pontos-j1 pontos-j2)
      (format stream "~% Nos analisados: ~a" nos-analisados)
      (format stream "~% Numero de cortes: ~a" num-cortes)
      (format stream "~% Duracao da jogada: ~a" tempo-jogada)
@@ -403,8 +437,8 @@
      (format stream "~%|                                                  |")
      (format stream "~%|               ~% O vencedor e: ~a!               |" vencedor)
      (format stream "~%|                                                  |")
-     (format stream "~%|              ~% Jogador 1: ~a pontos             |" pontos-j1)
-     (format stream "~%|              ~% Jogador 2: ~a pontos             |" pontos-j2)
+     (format stream "~%|               ~% Humano: ~a pontos             |" pontos-j1)
+     (format stream "~%|               ~% CPU: ~a pontos             |" pontos-j2)
      (format stream "~%|                                                  |")
      (format stream "~%o                                                  o")
      (format stream "~%~% "))))
