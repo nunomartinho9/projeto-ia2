@@ -189,7 +189,7 @@
                   (criar-no
                     (funcall fn-selecionar-problema resultado)
                     no-atual
-                    (- pontos1 pontos2)
+                    (abs (- pontos1 pontos2))
                     pontos1
                     pontos2)))
       (funcall fn-expandir-no (no-tabuleiro no-atual) peca-jogador1)))
