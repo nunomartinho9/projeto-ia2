@@ -30,7 +30,7 @@
          (modo-cvc)
          (iniciar)))
        (0
-        (format t "Obrigado por jogar!~%~%")
+        (progn (format t "Obrigado por jogar!~%~%") (abort))
        )
        (t (progn (format t "Escolha uma opcao valida!") (iniciar)))))))
 
