@@ -26,18 +26,18 @@
                 (fn-inverter-sinal-jogo 'inverter-sinal-tabuleiro)) ;; funcao geral para inverter o tabuleiro (proprio para o negamax)
   "Executa o algoritmo negamax para um no"
   (let* ((lista-expandidos (ordenar-negamax (gerar-sucessores
-                                             no
-                                             cor
-                                             fn-expandir-no
-                                             peca-jogador1
-                                             fn-selecionar-problema
-                                             fn-selecionar-pontos)
+                                              no
+                                              cor
+                                              fn-expandir-no
+                                              peca-jogador1
+                                              fn-selecionar-problema
+                                              fn-selecionar-pontos)
                                             cor))
          (tempo-decorrido (obter-tempo-gasto tempo-inicial))) ;; obter quanto tempo passou
     (cond
      ((or (= d-maximo 0) (= (length lista-expandidos) 0) (>= tempo-decorrido (/ tempo-limite 1000))) ;; se e' profundidade maxima, se e' no folha, se passou do tempo limite
-                                                                                                    (criar-no-solucao (if (= cor 1) no (inverter-sinal-no no fn-inverter-sinal-jogo)) ;; verificar se o no era min se sim, inverter o sinal ;;todo: algo de errado n esta certo aqui
-                                                                                                                      nos-analisados numero-cortes tempo-inicial)) ;; devolve o no com a jogada
+        ;;(criar-no-solucao no nos-analisados numero-cortes tempo-inicial))  
+        (criar-no-solucao (if (= cor 1) no (inverter-sinal-no no fn-inverter-sinal-jogo)) nos-analisados numero-cortes tempo-inicial)) ;; devolve o no com a jogada;; verificar se o no era min se sim, inverter o sinal ;;todo: algo de errado n esta certo aqui
      (T
        (negamax-aux ;;aplicar o auxiliar do negamax para os sucessores
                    no
@@ -54,17 +54,17 @@
                    fn-inverter-sinal-jogo)))))
 ;; ============= AUXILIARES NEGAMAX =============
 (defun negamax-aux (no-pai
-                    sucessores
-                    tempo-limite
-                    d-maximo
-                    peca-jogador1
-                    cor
-                    alfa
-                    beta
-                    tempo-inicial
-                    nos-analisados
-                    numero-cortes
-                    fn-inverter-sinal-jogo)
+                     sucessores
+                     tempo-limite
+                     d-maximo
+                     peca-jogador1
+                     cor
+                     alfa
+                     beta
+                     tempo-inicial
+                     nos-analisados
+                     numero-cortes
+                     fn-inverter-sinal-jogo)
   "Negamax Auxiliar"
   (cond
    ((= (length sucessores) 1) ;; so tem 1 no
@@ -191,11 +191,11 @@
                                   (no-jogador2 no-atual))))
 
                 (criar-no
-                 (funcall fn-selecionar-problema resultado)
-                 no-atual
-                 (abs (- pontos1 pontos2))
-                 pontos1
-                 pontos2)))
+                  (funcall fn-selecionar-problema resultado)
+                  no-atual
+                  (abs (- pontos1 pontos2))
+                  pontos1
+                  pontos2)))
     (funcall fn-expandir-no (no-tabuleiro no-atual) peca-jogador1)))
 
 
