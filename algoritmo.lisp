@@ -84,7 +84,6 @@
                               tempo-limite
                               (1- d-maximo)
                               peca-jogador1
-
                               (- cor)
                               (- beta)
                               (- alfa)
@@ -98,7 +97,8 @@
             (nos-analisados-solucao (solucao-nos-analisados (cadr solucao))) ;; nos analisados da solucao
             (numero-cortes-solucao (solucao-numero-cortes (cadr solucao)))) ;; numero de cortes da solucao
        (if (>= novo-alfa beta) ;;corte
-           (criar-no-solucao no-pai nos-analisados-solucao (1+ numero-cortes-solucao) tempo-inicial)
+           (criar-no-solucao (if (= cor 1) no-pai (inverter-sinal-no no-pai fn-inverter-sinal-jogo)) 
+                             nos-analisados-solucao (1+ numero-cortes-solucao) tempo-inicial)
 
            ;;nao tem corte
            (negamax-aux no-pai
