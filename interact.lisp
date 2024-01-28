@@ -3,8 +3,8 @@
 ;; Ano letivo 23/24
 
 (defun diretorio ()
-  ;;"C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
-  "U:/Documents/LEI/AnoCorrente/IA/projeto_2/" ;altera a pasta para o novo diretorio
+  "C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
+  ;;"U:/Documents/LEI/AnoCorrente/IA/projeto_2/" ;altera a pasta para o novo diretorio
 )
 
 (compile-file (concatenate 'string (diretorio) "algoritmo.lisp"))
@@ -101,7 +101,7 @@
 
              (progn
               (format T "~%Nao ha mais jogadas possiveis! O jogo terminou!~%")
-              (format-vencedor-hvc no-atual)))
+              (log-vencedor-hvc no-atual)))
            ((eq jogador -2) ;; jogada Humano               
 
                            (if (not humano-pode-mover)
@@ -125,7 +125,7 @@
                                                                          (+ (resultado-pontos tabuleiro-jogada) (no-jogador2 no-atual)))))
 
                                      (progn
-                                      (format T "posicao escolhida invalida");;todo voltar a perguntar as coordenadas e tentar jogar outravez
+                                      (format T "~%Posicao escolhida invalida!~%");;todo voltar a perguntar as coordenadas e tentar jogar outravez
                                       (hvc tempo-limite profund-max -2 no-atual))))))
            (t ;; jogada CPU
 
@@ -189,7 +189,7 @@
 
              (progn
               (format T "~%Nao ha mais jogadas possiveis! Jogo terminou!~%"))
-             (format-vencedor-cvc no-atual)) ;; apresentar vencedor
+              (log-vencedor-cvc no-atual)) ;; apresentar vencedor
 
            ((eq jogador -1) ;; cpu 1
 
@@ -211,16 +211,17 @@
 
              (if cpu2-pode-mover
 
-                 (let ((no-solucao (negamax (inverter-sinal-no no-atual 'inverter-sinal-tabuleiro) tempo-limite profund-max)))
-                   (progn
-                    (format-estado
-                      (list (inverter-sinal-no (car no-solucao) 'inverter-sinal-tabuleiro)
+                 (let* ((no-solucao (negamax (inverter-sinal-no no-atual 'inverter-sinal-tabuleiro) tempo-limite profund-max))
+                        (inverter-sinal (inverter-sinal-no (car no-solucao) 'inverter-sinal-tabuleiro))
+                        (inverter-dados (list inverter-sinal
                             (list (solucao-nos-analisados (cadr no-solucao))
                                   (solucao-numero-cortes (cadr no-solucao))
-                                  (solucao-tempo-gasto (cadr no-solucao))))
-                      -2)
-                    (escrever-log-jogada no-solucao -2)
-                    (cvc tempo-limite profund-max -1 (inverter-sinal-no (car no-solucao) 'inverter-sinal-tabuleiro))))
+                                  (solucao-tempo-gasto (cadr no-solucao)))))
+                  )
+                   (progn
+                    (format-estado inverter-dados -2)
+                    (escrever-log-jogada inverter-dados -2)
+                    (cvc tempo-limite profund-max -1 inverter-sinal)))
                  (progn
                   (format t "~%-------------------------------------------------------------~%")
                   (format-tabuleiro-coord tabuleiro-atual)
@@ -369,41 +370,48 @@
          (iniciante (second dados))
          (tempo-limite (third dados)))
     (progn
-     (format stream "~%o                                                  o")
-     (format stream "~%|                - Jogo do Cavalo -                |")
-     (format stream "~%|                 Partida iniciada.                |")
-     (format stream "~%|                                                  |")
-     (format stream "~%|            Modo de Jogo: ~a           |" modo)
+     (format stream "~%o ----------------------------------------------- o")
+     (format stream "~%                - Jogo do Cavalo -                ")
+     (format stream "~%                 Partida iniciada.                ")
+     (format stream "~%                                                  ")
+     (format stream "~%            Modo de Jogo: ~a                      " modo)
      (if iniciante
-         (format stream "~%|            1.o a jogar: ~a                   |" iniciante)
+     (format stream "~%            1.o a jogar: ~a                       " iniciante)
          (continue))
-     (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
-     (format stream "~%|                                                  |")
-     (format stream "~%o                                                  o")
+     (format stream "~%            Tempo limite do CPU: ~a ms            " tempo-limite)
+     (format stream "~%                                                  ")
+     (format stream "~%o ----------------------------------------------- o")
      (format stream "~%~%"))))
 
+(defun log-vencedor (dados &optional (stream t))
+  "Output de dados finais do jogo."
+  (let* ((pontos-j1 (no-jogador1 (car dados)))
+         (pontos-j2 (no-jogador2 (car dados)))
+         (vencedor (if (> pontos-j1 pontos-j2) -1 -2))
+         (jogador1-text (second dados))
+         (jogador2-text (third dados))
+    )
+  (progn
+     (format stream "~%o ----------------------------------------------- o")
+     (format stream "~%                - Jogo do Cavalo -               ")
+     (format stream "~%                Partida terminada.               ")
+     (format stream "~%                                                 ")
+     (format stream "~%                 O vencedor e: ~a!               " vencedor)
+     (format stream "~%                                                 ")
+     (format stream "~%                   ~a: ~a pontos                 " jogador1-text pontos-j1)
+     (format stream "~%                   ~a: ~a pontos                 " jogador2-text pontos-j2)
+     (format stream "~%                                                 ")
+     (format stream "~%o ----------------------------------------------- o")
+     (format stream "~%~%")
+   )))
 
-(defun format-vencedor (no jogador1-text jogador2-text &optional (stream t))
-  (let* ((pontos-j1 (no-jogador1 no))
-         (pontos-j2 (no-jogador2 no))
-         (vencedor (if (> pontos-j1 pontos-j2) -1 -2)))
-    (format stream "~%o                                                  o
-                    ~%|                - Jogo do Cavalo -                |
-                    ~%|                Partida terminada.                |
-                    ~%|                                                  |
-                    ~%|               ~% O vencedor e: ~a!               |
-                    ~%|                                                  |
-                    ~%|               ~% ~a: ~a pontos                   |
-                    ~%|               ~% ~a: ~a pontos                   |
-                    ~%|                                                  |
-                    ~%o                                                  o
-                    ~%~% " vencedor jogador1-text pontos-j1 jogador2-text pontos-j2)))
+(defun log-vencedor-hvc (no &optional (stream t))
+"Output de dados do final do jogo HvC no ecra e ficheiro."
+  (escrever-log 'log-vencedor no "Humano" "CPU" stream))
 
-(defun format-vencedor-hvc (no &optional (stream t))
-  (format-vencedor no "Humano" "CPU" stream))
-
-(defun format-vencedor-cvc (no &optional (stream t))
-  (format-vencedor no "CPU1" "CPU2" stream))
+(defun log-vencedor-cvc (no &optional (stream t))
+"Output de dados do final do jogo CvC no ecra e ficheiro."
+  (escrever-log 'log-vencedor no "CPU1" "CPU2" stream))
 #| (defun format-vencedor-hvc (no &optional (stream t))
   
   (let* ((pontos-j1 (no-jogador1 no))
@@ -425,22 +433,3 @@
    )
     )
   ) |#
-
-
-(defun log-fim (dados &optional (stream t))
-  "Mostra o resultado do jogo."
-  (let* ((pontos-j1 ())
-         (pontos-j2 ())
-         (vencedor ()))
-    (progn
-     (format stream "~%o                                                  o")
-     (format stream "~%|                - Jogo do Cavalo -                |")
-     (format stream "~%|                Partida terminada.                |")
-     (format stream "~%|                                                  |")
-     (format stream "~%|               ~% O vencedor e: ~a!               |" vencedor)
-     (format stream "~%|                                                  |")
-     (format stream "~%|               ~% Humano: ~a pontos             |" pontos-j1)
-     (format stream "~%|               ~% CPU: ~a pontos             |" pontos-j2)
-     (format stream "~%|                                                  |")
-     (format stream "~%o                                                  o")
-     (format stream "~%~% "))))
