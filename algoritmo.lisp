@@ -2,8 +2,7 @@
 
 ;; ============= ESTRUTURAS =============
 ;; <no>::= (<tabuleiro> <pai> <f> pontos1 pontos2)
-;;<jogada>::= (<jogador> <linha> <coluna>)
-;; <solucao>::= (<caminho-solucao> <n-abertos> <n-fechados>)
+
 
 
 ;; ============= ALGORITMOS =============
@@ -174,7 +173,7 @@
   "Recebe um tabuleiro, e apartir dele cria um no com a estrutura definida."
   (list tabuleiro pai f pontos1 pontos2))
 
-;; (gerar-sucessores (no-teste) 1 'usar-operadores jogador-1 jogador-2 'resultado-tabuleiro 'resultado-pontos)
+;; (gerar-sucessores (no-teste) 1 'usar-operadores jogador-1 'resultado-tabuleiro 'resultado-pontos)
 (defun gerar-sucessores (no-atual cor fn-expandir-no peca-jogador1 fn-selecionar-problema fn-selecionar-pontos)
   "Recebe um no e a funcao de expansao de nos, 
   (a funcao passada normalmente vai ser a usar-operadores que ira gerar uma lista das proximas jogadas)

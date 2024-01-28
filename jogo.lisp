@@ -36,7 +36,7 @@
     (33 70 84 40 66 38 92 67 98 97)))
 
 (defun tabuleiro-erro ()
-  "Tabuleiro de teste sem nenhuma jogada realizada"
+
   '((-1 25 54 89 21 8 36 14 41 96)
     (78 47 -2 23 5 49 13 12 26 60)
     (0 NIL 17 83 34 93 74 52 45 80)
