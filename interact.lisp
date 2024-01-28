@@ -3,8 +3,8 @@
 ;; Ano letivo 23/24
 
 (defun diretorio ()
-  ;;"C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
-  "U:/Documents/LEI/AnoCorrente/IA/projeto_2/" ;altera a pasta para o novo diretorio
+  "C:/Users/joaor/OneDrive/Documentos/IPS/ESTS/LEI/3_ANO/IA/Projeto/ia-projeto2/"
+  ;;"U:/Documents/LEI/AnoCorrente/IA/projeto_2/" ;altera a pasta para o novo diretorio
 )
 
 (compile-file (concatenate 'string (diretorio) "algoritmo.lisp"))
@@ -30,11 +30,8 @@
          (modo-cvc)
          (iniciar)))
        (0
-        (progn
-         (format t "Obrigado por jogar!~%~%")
-         (clear-input)
-         (clear-output)
-         (finish-output)))
+        (format t "Obrigado por jogar!~%~%")
+       )
        (t (progn (format t "Escolha uma opcao valida!") (iniciar)))))))
 
 
@@ -48,14 +45,23 @@
 
 (defun modo-hvc ()
   "Executa o modo de jogo Humano vs Computador."
-  (let* ((iniciante (opcao-iniciante))
-         (tempo-limite (opcao-tempo))
-         (profund-max (opcao-profund-max)))
     (progn
-     (escrever-log 'log-inicio (list "Humano vs CPU" iniciante tempo-limite profund-max))
-     (case iniciante
-       ('Humano (hvc tempo-limite profund-max -2))
-       ('CPU (hvc tempo-limite profund-max -1))))))
+        (menu-iniciante)
+        (let ((iniciante (read)))
+            (cond
+                ((and (not (numberp iniciante)) (or (> iniciante 2) (< iniciante 0))) 
+                    (progn (format t "Escolha uma opcao valida!") (modo-hvc)))
+                ((eql iniciante 0) (iniciar))
+                (t (let* ((tempo-limite (opcao-tempo))
+                            (profund-max (opcao-profund-max))
+                        )
+                        (case iniciante
+                            (1 (progn 
+                                    (escrever-log 'log-inicio (list "Humano vs CPU" 'Humano tempo-limite profund-max)) 
+                                    (hvc tempo-limite profund-max -2)))
+                            (2 (progn
+                                    (escrever-log 'log-inicio (list "Humano vs CPU" 'CPU tempo-limite profund-max)) 
+                                    (hvc tempo-limite profund-max -1))))))))))
 
 (defun modo-cvc ()
   "Executa o modo de jogo Computador vs Computador."
@@ -177,7 +183,7 @@
      (cond
       ((and (>= tempo 1000) (<= tempo 5000))
         tempo)
-      ((eql tempo 0) (opcao-iniciante))
+      ((eql tempo 0) (iniciar))
       (t (progn (format t "Escolha uma opcao valida!") (opcao-tempo)))))))
 
 (defun opcao-profund-max ()
@@ -234,10 +240,10 @@
    (format t "~%o                                                  o")
    (format t "~%|          - Escolha quem comeca o jogo -          |")
    (format t "~%|                                                  |")
-   (format t "~%|                  1 - Humano                      |")
-   (format t "~%|                  2 - CPU                         |")
+   (format t "~%|               1 - Humano (peca -2)               |")
+   (format t "~%|               2 - CPU (peca -1)                  |")
    (format t "~%|                                                  |")
-   (format t "~%|                  0 - Voltar                      |")
+   (format t "~%|               0 - Voltar ao inicio               |")
    (format t "~%o                                                  o")
    (format t "~%~%>> ")))
 
@@ -248,7 +254,7 @@
    (format t "~%|  - Defina o tempo limite para a jogada do CPU -  |")
    (format t "~%|           (1000 a 5000 milissegundos)            |")
    (format t "~%|                                                  |")
-   (format t "~%|                    0 - Voltar                    |")
+   (format t "~%|               0 - Voltar ao inicio               |")
    (format t "~%o                                                  o")
    (format t "~%~%>> ")))
 
@@ -258,7 +264,7 @@
    (format t "~%o                                                  o")
    (format t "~%|         - Defina a profundidade maxima -         |")
    (format t "~%|                                                  |")
-   (format t "~%|                     0 - Voltar                   |")
+   (format t "~%|               0 - Voltar ao inicio               |")
    (format t "~%o                                                  o")
    (format t "~%~%>> ")))
 
@@ -269,7 +275,7 @@
 
 ;; ============= ESTATISTICAS =============
 
-(defun escrever-log (fn dados)
+(defun escrever-log (fn &rest dados)
   "Output de registos estatisticos do jogo no ecra e no ficheiro."
   (progn
    (funcall fn t dados) ;; escrever no ecra
@@ -309,7 +315,7 @@
                 (format stream "~%|            1.o a jogar: ~a                   |" iniciante)
                 (continue)
             )
-            (format stream "~%|            Tempo limite do CPU: ~a ms          |" tempo-limite)
+            (format stream "~%|            Tempo limite do CPU: ~a ms            |" tempo-limite)
             (format stream "~%|                                                  |")
             (format stream "~%o                                                  o")
             (format stream "~%~%")
@@ -329,9 +335,13 @@
          (num-cortes ())
          (tempo-jogada ()))
     (progn
+     (format stream "~%")
      (format-tabuleiro-coord tabuleiro stream)
-     (format stream "~% O Jogador ~a jogou na posicao (~a, ~a)." jogador linha coluna)
-     (format stream "~% Pontos atuais: J1 - ~a pontos | J2 - ~a pontos" pontos-j1 pontos-j2)
+     (if (eql jogador -2)
+        (format stream "~% O Humano jogou na posicao (~a, ~a)." linha coluna)
+        (format stream "~% O CPU jogou na posicao (~a, ~a)." linha coluna)
+     )
+     (format stream "~% Pontos atuais: Humano - ~a pontos | CPU - ~a pontos" pontos-j1 pontos-j2)
      (format stream "~% Nos analisados: ~a" nos-analisados)
      (format stream "~% Numero de cortes: ~a" num-cortes)
      (format stream "~% Duracao da jogada: ~a" tempo-jogada)
@@ -351,8 +361,8 @@
      (format stream "~%|                                                  |")
      (format stream "~%|               ~% O vencedor e: ~a!               |" vencedor)
      (format stream "~%|                                                  |")
-     (format stream "~%|              ~% Jogador 1: ~a pontos             |" pontos-j1)
-     (format stream "~%|              ~% Jogador 2: ~a pontos             |" pontos-j2)
+     (format stream "~%|               ~% Humano: ~a pontos             |" pontos-j1)
+     (format stream "~%|               ~% CPU: ~a pontos             |" pontos-j2)
      (format stream "~%|                                                  |")
      (format stream "~%o                                                  o")
      (format stream "~%~% "))))
