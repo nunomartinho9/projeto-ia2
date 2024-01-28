@@ -350,11 +350,6 @@ Durante a execução do programa, ao escolher a opção de jogo entre computador
 ## Análise Estatística
 
 
-<aside>
-💡 Deverão fazer uma análise estatística acerca de uma execução do programa contra um adversário humano, mencionando o limite de tempo usado e, para cada jogada: o respetivo valor, a profundidade do grafo de jogo e o número de cortes efetuado no processo de análise. Poderão utilizar os dados do ficheiro log.dat para isso.
-
-</aside>
-
 De seguida, é apresentada uma análise estatística de uma partida *Humano vs Computador* recorrendo aos dados arquivados no ficheiro *log.dat* durante esse jogo. 
 
 Neste *log,* aquando da pontuação, J1 refere-se ao Computador (CPU) enquanto que J2 refere-se ao Humano (Utilizador). As peças do tabuleiro -1 e -2 correspondem, respetivamente, ao CPU e ao Utilizador.
