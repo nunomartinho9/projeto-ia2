@@ -82,7 +82,7 @@ Para regressar ao menu inicial (ou sair da aplicação no caso de já estar loca
 
 Para poder iniciar uma partida do Jogo do Cavalo deverá selecionar um dos modos de jogo disponíveis no menu seguinte.
 
-![Untitled](imagens/Untitled%201.png)
+![Untitled](./manuais/imagens/Untitled%201.png)
 
 - Se escolher a opção **1 - Humano vs CPU** - será iniciada uma partida em que o utilizador irá jogar contra o computador.
 - Caso escolha a opção **2 - CPU vs CPU** - será iniciada uma partida em que o computador irá jogar contra um outro computador.
@@ -93,14 +93,14 @@ Para poder iniciar uma partida do Jogo do Cavalo deverá selecionar um dos modos
 
 Neste menu poderá escolher quem irá ser o primeiro a jogar: Humano (opção 1) ou Computador (opção 2).
 
-![Untitled](imagens/Untitled%202.png)
+![Untitled](./manuais/imagens/Untitled%202.png)
 
 > **Definir o tempo limite da jogada do CPU**
 > 
 
 Para que as jogadas efetuadas pelo Computador não demorem muito tempo, terá de definir o tempo limite da jogada do mesmo.
 
-![Untitled](imagens/Untitled%203.png)
+![Untitled](./manuais/imagens/Untitled%203.png)
 
 > **Definir a profundidade máxima**
 > 
@@ -112,7 +112,7 @@ Defina a profundidade máxima do algoritmo de procura no menu seguinte.
 
 </aside>
 
-![Untitled](imagens/Untitled%204.png)
+![Untitled](./manuais/imagens/Untitled%204.png)
 
 > **Jogabilidade**
 > 
